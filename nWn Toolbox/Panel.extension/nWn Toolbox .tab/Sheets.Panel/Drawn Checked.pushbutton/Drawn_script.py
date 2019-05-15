@@ -7,17 +7,15 @@ __author__ = "nWn"
 # Import commom language runtime
 import clr
 
+# Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
-         Transaction, TransactionGroup
+                            Transaction, TransactionGroup
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
 clr.AddReference('System.Drawing')
 
-from System.Windows.Forms import *
-from System.Drawing import *
-
-from System.Drawing import Point
+from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox
 
 # Create a class form
@@ -31,16 +29,16 @@ class CreateWindow(Form):
 		
 		self.value = ""
 		
-		# Create label for number of divisions
-		labelDiv = Label(Text = "Name of " + author + ":")
+		# Create label for input title
+		labelDiv = Label(Text = author + ":")
 		labelDiv.Parent = self
-		labelDiv.Size = Size(200, 150)
+		labelDiv.Size = Size(100, 150)
 		labelDiv.Location = Point(30, 20)
 		
-		# Create TextBox for number of divisions
+		# Create TextBox for input
 		self.textboxDiv = TextBox()
 		self.textboxDiv.Parent = self
-		self.textboxDiv.Text = "10"
+		self.textboxDiv.Text = "Name"
 		self.textboxDiv.Location = Point(300, 20)
 	
 		# Create button
@@ -62,14 +60,14 @@ class CreateWindow(Form):
 				labelDiv = Label(Text = "Enter number please: ")
 
 # Call the CreateWindow class and create the input for Drawer
-formDrawer = CreateWindow("Change Parameter Drawn By", "Drawer")
+formDrawer = CreateWindow("Change Parameter Drawn By", "Drawn by")
 Application.Run(formDrawer)
 
 # Assign the input to variable
 nameDrawer = formDrawer.value
 
 # Call the CreateWindow class and create the input for Checker
-formChecker = CreateWindow("Change Parameter Checked By", "Checker")
+formChecker = CreateWindow("Change Parameter Checked By", "Checked by")
 Application.Run(formChecker)
 
 # Assign the input to variable
@@ -106,8 +104,8 @@ def modParameter(param, checkEmpty, inputParam):
     sheetNumber = sheet.LookupParameter("Sheet Number").AsString()
     # Retrieve sheet parameter
     sheetDrawn = sheet.LookupParameter(param)
-    # Convert parameter to string, check if it is empty and set it with user input
-    if sheetDrawn.AsString() == checkEmpty:
+    # Check if it is by default and input is not empty, set it with user input
+    if sheetDrawn.AsString() == checkEmpty and inputParam != "":
         sheetDrawn.Set(inputParam)
         # Check if the sheet has been previously modified and append to list
         if sheetNumber not in modSheets:
@@ -120,11 +118,11 @@ for sheet in sheetsCollector:
     # Call function to modify Checker
     modParameter("Checked By", "Checker", nameChecker)
 
-# Print all changed sheets
-print(modSheets)
-
 # Commit individual transaction
 t.Commit()
 
 # Combine all individual transaction in the group transaction
 tg.Assimilate()
+
+# Print all changed sheets
+print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
