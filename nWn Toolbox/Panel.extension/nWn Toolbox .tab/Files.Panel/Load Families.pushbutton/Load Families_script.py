@@ -15,21 +15,39 @@ from Autodesk.Revit.DB import Transaction, TransactionGroup
 import os
 import re
 
+# Import libraries to create a Windows form
+clr.AddReference("System.Windows.Forms")
+clr.AddReference("System.Drawing")
+
+from System.Windows.Forms import FolderBrowserDialog
+from System.Windows.Forms import DialogResult
+
+# Store user specified path
+directory = ""
+
+# Create folder browser window 
+dialog = FolderBrowserDialog()
+
+# Record for user action and store selected path
+if (dialog.ShowDialog() == DialogResult.OK):
+	directory = dialog.SelectedPath
+
 # Retrieve all pathfiles and names from directory and subdirectories
 def retrieveFamilies(directory):
 	familiesNames = list()
 	for folderName, subFolders, files in os.walk(directory):
 		# Check if there are Revit families
-		families = re.compile(r".*\.rfa$")
+		families = re.compile(r"\.rfa$")
 		for file in files:
 			# Assign matched files to a variable
 			matched = families.search(file)
-			# Get path of families
-			filePath = os.path.join(folderName, file)
-			familiesNames.append(filePath)
+			if matched:
+				# Get path of families
+				filePath = os.path.join(folderName, file)
+				familiesNames.append(filePath)
 	return familiesNames
 
-directory = r"C:\ProgramData\Autodesk\RVT 2018\Libraries\Australia\Doors"
+# Call function to search for families in path and subfolders
 familiesList = retrieveFamilies(directory)
 
 # Store current document into variable
@@ -57,5 +75,13 @@ for family in familiesList:
 # Commit individual transaction
 t.Commit()
 
-print("The following families have been loaded:")
-print("\n".join(familiesList))
+# Print message to user about results
+if len(loadedFam) == 0:
+	print("No family has been loaded")
+else:
+	print("The following families have been loaded: \n")
+	print("\n".join(loadedFam))
+
+if len(notLoadedFam) != 0:
+	print("The following families load have failed: \n")
+	print("\n".join(notLoadedFam))
