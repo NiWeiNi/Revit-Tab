@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Fills in empty Drawn and Checked parameters with custom input.
+"""Fills in empty Drawn by and Checked by parameters with custom input.
 
-NOTE: It will not overrride already filled in parameters."""
+NOTE: 
+It will not overrride already filled in parameters."""
+
 __author__ = "nWn"
 
 # Import commom language runtime
@@ -57,7 +59,7 @@ class CreateWindow(Form):
 				self.value = self.textboxDiv.Text
 				self.Close()
 			except:
-				labelDiv = Label(Text = "Enter number please: ")
+				self.Close()
 
 # Call the CreateWindow class and create the input for Drawer
 formDrawer = CreateWindow("Change Parameter Drawn By", "Drawn by")
@@ -80,7 +82,6 @@ uidoc = __revit__.ActiveUIDocument
 
 # Collects all sheets in current document
 sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets) \
-                                                .WhereElementIsNotElementType() \
                                                 .ToElements()
 
 # Create a Transaction group to group all subsequent transactions
