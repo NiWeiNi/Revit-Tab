@@ -2,7 +2,8 @@
 """Load families from a directory.
 
 Note:
-Families in the project will be overridden."""
+As this script will load all families in subfolders,
+please be as specific as possible selecting the folder."""
 __author__ = "nWn"
 
 # Import commom language runtime
