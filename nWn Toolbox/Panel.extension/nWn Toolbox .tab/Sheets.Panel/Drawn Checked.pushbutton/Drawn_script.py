@@ -2,7 +2,7 @@
 """Fills in empty Drawn by and Checked by parameters with custom input.
 
 NOTE: 
-It will not overrride already filled in parameters."""
+Already filled in parameters will not be overridden."""
 
 __author__ = "nWn"
 
