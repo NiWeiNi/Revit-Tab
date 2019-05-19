@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Place a 3D symbol in the center of gravity of the selected element.
 
-Note: the 3D symbol will be added in the assembly"""
+Note: 
+Select the element before executing the script. 
+The CoG is approximate."""
 __author__ = "nWn"
 
 # Import commom language runtime
@@ -14,10 +16,17 @@ clr.AddReferenceByPartialName('System.Windows.Forms')
 
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.UI import *
+from Autodesk.Revit.Creation import *
 
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
+
+from operator import itemgetter, attrgetter, methodcaller
+import System
+
+"""
+# selection = [ doc.GetElement( elId ) for elId in __revit__.ActiveUIDocument.Selection.GetElementIds() ]
 
 # Pick model curve in Revit document to place elements
 # Code based on john pierson´s isolated select model elements node
@@ -41,4 +50,42 @@ class CustomISelectionFilter(Selection.ISelectionFilter):
 el_ref = sel1.PickObject(obt1, CustomISelectionFilter("Walls"))
 		
 # Stores the selected modelcurve into curve, marks it as Revit owned element and extracts geometry
-element = SpatialElementGeometryCalculator(doc).CalculateSpatialElementGeometry(el_ref)
+
+opt = Options()
+a = doc.GetElement(el_ref)
+print(dir(a))
+
+
+"""
+# Create a individual transaction to start changes in Revit database
+t = Transaction(doc, "Place CoG Symbol")
+# Start transaction
+t.Start()
+
+# Select family to place as CoG
+markingSymbol = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
+markingSymbol.OfClass(FamilySymbol).ToElements()
+
+cogSymbol = markingSymbol.FirstElement()
+for element in markingSymbol:
+	if element.FamilyName == "CoG":
+		cogSymbol = element
+		print(cogSymbol.FamilyName)
+
+ 
+print(cogSymbol)
+
+selection = [ doc.GetElement( elId ) for elId in __revit__.ActiveUIDocument.Selection.GetElementIds() ]
+
+opt = Options()
+
+for i in selection:
+	geo = i.get_Geometry(opt)
+	for a in geo:
+		geo = a.ComputeCentroid()
+		print(geo)
+
+cogPlaced = doc.Create.NewFamilyInstance(geo, cogSymbol, Structure.StructuralType.NonStructural)
+
+# End transaction
+t.Commit()
