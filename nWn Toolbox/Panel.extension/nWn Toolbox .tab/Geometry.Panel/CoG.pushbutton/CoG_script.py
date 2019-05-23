@@ -2,7 +2,7 @@
 """Place a 3D symbol in the center of gravity of the selected element.
 
 Note: 
-Select the element before executing the script. 
+Select the element/s before executing the script. 
 The CoG is approximate."""
 __author__ = "nWn"
 
@@ -70,12 +70,13 @@ cogSymbol = markingSymbol.FirstElement()
 for element in markingSymbol:
 	if element.FamilyName == "CoG":
 		cogSymbol = element
-		print(cogSymbol.FamilyName)
 
- 
-print(cogSymbol)
 
-selection = [ doc.GetElement( elId ) for elId in __revit__.ActiveUIDocument.Selection.GetElementIds() ]
+
+selection = [doc.GetElement( elId ) for elId in __revit__.ActiveUIDocument.Selection.GetElementIds()]
+
+# Store list of CoG
+cogLst = list()
 
 opt = Options()
 
@@ -83,9 +84,11 @@ for i in selection:
 	geo = i.get_Geometry(opt)
 	for a in geo:
 		geo = a.ComputeCentroid()
-		print(geo)
+		cogLst.append(geo)
 
-cogPlaced = doc.Create.NewFamilyInstance(geo, cogSymbol, Structure.StructuralType.NonStructural)
+# Place CoG symbols
+for cog in cogLst:
+	cogPlaced = doc.Create.NewFamilyInstance(cog, cogSymbol, Structure.StructuralType.NonStructural)
 
 # End transaction
 t.Commit()
