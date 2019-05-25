@@ -10,7 +10,7 @@ import clr
 # from Autodesk.Revit.UI import *
 from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
 							BuiltInCategory, IntersectionResultArray, Transaction, \
-							TransactionGroup, Curve, IntersectionResult, XYZ
+							TransactionGroup, Curve
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -22,11 +22,32 @@ gridsCollector = FilteredElementCollector(doc).WherePasses(gridsFilter) \
 											.WhereElementIsNotElementType() \
 											.ToElements()
 
+# Variables to split grids into columns and rows
+gridsColumn = []
+gridsRow = []
+
+# Check grids name
+for grid in gridsCollector:
+	gridName = grid.LookupParameter("Name").AsString()
+	if any(char.isdigit() for char in gridName):
+		gridsColumn.append(grid)
+	else:
+		gridsRow.append(grid)
+
+# Variables to store grids Name and intersection points
+gridsPair = []
+gridsIntersection = []
+
 # Create IntersectionArray object
 interRes = clr.Reference[IntersectionResultArray]()
 
-# Check for intersections
-inter = gridsCollector[0].Curve.Intersect(gridsCollector[4].Curve, interRes)
+# Check for intersections and append grids names as pairs and intersection points
+for gC in gridsColumn:
+	for gR in gridsRow:
+		inter = gC.Curve.Intersect(gR.Curve, interRes)
+		gCName = gC.LookupParameter("Name").AsString()
+		gRName = gR.LookupParameter("Name").AsString()
+		gridsPair.append((gCName, gRName))
+		gridsIntersection.append(interRes.Item[0].XYZPoint)
 
-
-print(interRes.Item[0].XYZPoint)
+print(gridsIntersection)

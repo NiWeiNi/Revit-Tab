@@ -56,7 +56,7 @@ class CustomISelectionFilter(Selection.ISelectionFilter):
 		else:
 			return False
 	def AllowReference(self, ref, point):
-		return true
+		return True
 
 el_ref = sel1.PickObject(obt1, CustomISelectionFilter("Lines"))
 		

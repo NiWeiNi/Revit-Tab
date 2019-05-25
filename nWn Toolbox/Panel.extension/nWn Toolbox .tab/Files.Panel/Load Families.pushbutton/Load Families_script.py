@@ -2,15 +2,15 @@
 """Load families from a directory.
 
 Note:
-As this script will load all families in subfolders,
-please be as specific as possible selecting the folder."""
+Please be as specific as possible selecting the folder,
+as this script that loads all families in subfolders."""
 __author__ = "nWn"
 
 # Import commom language runtime
 import clr
 
 # from Autodesk.Revit.UI import *
-from Autodesk.Revit.DB import Transaction, TransactionGroup
+from Autodesk.Revit.DB import Transaction, TransactionGroup, IFamilyLoadOptions
 
 # Import Python modules
 import os
@@ -38,7 +38,7 @@ def retrieveFamilies(directory):
 	familiesNames = list()
 	for folderName, subFolders, files in os.walk(directory):
 		# Check if there are Revit families
-		families = re.compile(r"\.rfa$")
+		families = re.compile(r"[^{ddd+}]\.rfa$")
 		for file in files:
 			# Assign matched files to a variable
 			matched = families.search(file)
@@ -56,6 +56,14 @@ app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Class to define loading options, in 
+class familyLoadOptions(IFamilyLoadOptions):
+	def __init__(self, overwrite):
+		self.bool = overwrite
+	def OnFamilyFound(self, bool1, bool2):
+		return self.bool
+	def OnSharedFamilyFound(self, sfamily, bool1, familySource, bool2):
+		return self.bool
 
 # Create a individual transaction to change the parameters on sheet
 t = Transaction(doc, "Batch Load Families")
@@ -68,10 +76,10 @@ notLoadedFam = list()
 
 for family in familiesList:
 	try:
-		doc.LoadFamily(family)
+		doc.LoadFamily(family, familyLoadOptions(True))
 		loadedFam.append(family)
 	except:
-		notLoadedFam.append(fam)
+		notLoadedFam.append(family)
 
 # Commit individual transaction
 t.Commit()
@@ -82,7 +90,6 @@ if len(loadedFam) == 0:
 else:
 	print("The following families have been loaded: \n")
 	print("\n".join(loadedFam))
-
 if len(notLoadedFam) != 0:
 	print("The following families load have failed: \n")
 	print("\n".join(notLoadedFam))
