@@ -85,12 +85,12 @@ for family in familiesList:
 # Commit individual transaction
 t.Commit()
 
-# Print message to user about results
-if len(loadedFam) == 0:
-	print("No family has been loaded")
-else:
-	print("The following families have been loaded: \n")
-	print("\n".join(loadedFam))
-if len(notLoadedFam) != 0:
-	print("The following families load have failed: \n")
-	print("\n".join(notLoadedFam))
+# Function to display result to user
+def printMessage(resultList, message):
+	if len(resultList) != 0:
+		print(message)
+		print("\n".join(resultList))
+
+# Print message
+printMessage(loadedFam, "The following files has been changed:")
+printMessage(notLoadedFam, "The following families load have failed:")
