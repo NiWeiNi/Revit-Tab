@@ -11,7 +11,8 @@ __author__ = "nWn"
 import clr
 
 # from Autodesk.Revit.UI import *
-from Autodesk.Revit.DB import Transaction, TransactionGroup, IFamilyLoadOptions
+from Autodesk.Revit.DB import Transaction, TransactionGroup, \
+							IFamilyLoadOptions
 
 # Import Python modules
 import os
@@ -53,7 +54,6 @@ def retrieveFamilies(directory):
 familiesList = retrieveFamilies(directory)
 
 # Store current document into variable
-app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
@@ -92,5 +92,5 @@ def printMessage(resultList, message):
 		print("\n".join(resultList))
 
 # Print message
-printMessage(loadedFam, "The following files has been changed:")
+printMessage(loadedFam, "The following families were loaded:")
 printMessage(notLoadedFam, "The following families load have failed:")
