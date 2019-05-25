@@ -3,14 +3,14 @@
 
 Note:
 Allows placement of any family in the grids intersections."""
+__title__ = 'At Grids\nIntersection'
 __author__ = "nWn"
 # Import commom language runtime
 import clr
-
 # from Autodesk.Revit.UI import *
 from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
 							BuiltInCategory, IntersectionResultArray, Transaction, \
-							TransactionGroup, Curve
+							TransactionGroup, Curve, FamilySymbol
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -49,5 +49,19 @@ for gC in gridsColumn:
 		gRName = gR.LookupParameter("Name").AsString()
 		gridsPair.append((gCName, gRName))
 		gridsIntersection.append(interRes.Item[0].XYZPoint)
+
+# Select family to place in intersections
+markingSymbol = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
+markingSymbol.OfClass(FamilySymbol).ToElements()
+
+familyToPlace = markingSymbol.FirstElement()
+for element in markingSymbol:
+	if element.FamilyName == "CoG":
+		cogSymbol = element
+
+# Place families in the intersection grids
+for point in gridsIntersection:
+	familyPlaced = doc.Create.NewFamilyInstance(point, familyToPlace, Structure.StructuralType.NonStructural)
+
 
 print(gridsIntersection)

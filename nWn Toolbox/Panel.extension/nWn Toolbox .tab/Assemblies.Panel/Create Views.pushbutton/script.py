@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+__title__ = 'Create\nViews'
 # Import commom language runtime
 import clr
 

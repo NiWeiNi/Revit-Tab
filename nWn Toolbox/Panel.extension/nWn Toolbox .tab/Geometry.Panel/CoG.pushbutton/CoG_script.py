@@ -4,6 +4,7 @@
 Note: 
 Select the element/s before executing the script. 
 The CoG is approximate."""
+__title__ = 'Center of\nGravity'
 __author__ = "nWn"
 
 # Import commom language runtime

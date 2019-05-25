@@ -4,6 +4,7 @@
 Note:
 Please be as specific as possible selecting the folder,
 as this script that loads all families in subfolders."""
+__title__ = 'Batch Load\nFamilies'
 __author__ = "nWn"
 
 # Import commom language runtime
