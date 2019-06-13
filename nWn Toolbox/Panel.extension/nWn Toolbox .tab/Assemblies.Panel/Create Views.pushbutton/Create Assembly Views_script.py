@@ -1,31 +1,20 @@
 # -*- coding: utf-8 -*-
+"""Creates views with harcoded view templates for all assemblies of a specific type.
 
+NOTE: The views are harcoded and must be changed per project basis."""
 __title__ = 'Create\nViews'
+__author__ = "nWn"
 # Import commom language runtime
 import clr
 
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-from Autodesk.Revit.DB.Structure import *
+# from Autodesk.Revit.UI import *
+from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
+							BuiltInCategory, IntersectionResultArray, Transaction, \
+							TransactionGroup, Curve, FamilySymbol
 
-clr.AddReference('ProtoGeometry')
-from Autodesk.DesignScript.Geometry import *
-
-clr.AddReference('RevitAPIUI')
-from Autodesk.Revit.UI import *
-
-clr.AddReference('System')
-from System.Collections.Generic import List
-
-clr.AddReference('RevitNodes')
-import Revit
-clr.ImportExtensions(Revit.GeometryConversion)
-clr.ImportExtensions(Revit.Elements)
-
-clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
+# Store current document into variable
+doc = __revit__.ActiveUIDocument.Document
+uidoc = __revit__.ActiveUIDocument
 
 # Import modules to create windows dialogues in Revit for user input
 clr.AddReference('System.Windows.Forms')

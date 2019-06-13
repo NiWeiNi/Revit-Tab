@@ -17,9 +17,8 @@ doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Select all grids by filter
-gridsFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
-gridsCollector = FilteredElementCollector(doc).WherePasses(gridsFilter) \
-											.WhereElementIsNotElementType() \
+assembliesFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
+assCollector = FilteredElementCollector(doc).WherePasses(assembliesFilter) \
 											.ToElements()
 
 # Variables to split grids into columns and rows
