@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Fills in empty Drawn by and Checked by parameters with custom input.
+"""Print all sheets with a specified revision date. 
 
 NOTE: 
-Already filled in parameters will not be overridden."""
+Name of the files will be sheet name and appended revision.
+Existing files will be overridden."""
 __title__ = 'Print by\nRev Date'
 __author__ = "nWn"
 
@@ -20,6 +21,7 @@ clr.AddReference('System.Drawing')
 from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox
 
+"""
 # Create a class form
 class CreateWindow(Form):
 	def __init__(self, title, author):
@@ -127,3 +129,4 @@ tg.Assimilate()
 
 # Print all changed sheets
 print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
+"""
