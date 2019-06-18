@@ -12,7 +12,7 @@ import clr
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
-                            Transaction, TransactionGroup
+                            Transaction, TransactionGroup, ElementId
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
@@ -77,15 +77,28 @@ Application.Run(formChecker)
 # Assign the input to variable
 nameChecker = formChecker.value
 
+"""
 # Store current document to variable
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Collects all sheets in current document
-sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets) \
-                                                .ToElements()
+sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets)
 
+# Revision date to print
+revDate = "Date 1"
+
+# Variable to store sheets with revisions
+sheets = []
+
+# Get curent revision on sheets
+for s in sheetsCollector:
+	if s.GetCurrentRevision() != ElementId.InvalidElementId and doc.GetElement(s.GetCurrentRevision()).RevisionDate:
+		rev = doc.GetElement(s.GetCurrentRevision())
+		sheets.append(s)
+
+"""
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Update Drawn By and Checked By")
 
