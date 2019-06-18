@@ -10,17 +10,19 @@ import clr
 # from Autodesk.Revit.UI import *
 from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
 							BuiltInCategory, IntersectionResultArray, Transaction, \
-							TransactionGroup, Curve, FamilySymbol
+							TransactionGroup, FamilySymbol, Structure
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Select all grids by filter
-assembliesFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
-assCollector = FilteredElementCollector(doc).WherePasses(assembliesFilter) \
-											.ToElements()
+gridsFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
+gridsCollector = FilteredElementCollector(doc).WherePasses(gridsFilter) \
+				.WhereElementIsNotElementType()
 
+for g in gridsCollector:
+	print(g)
 # Variables to split grids into columns and rows
 gridsColumn = []
 gridsRow = []
@@ -61,6 +63,5 @@ for element in markingSymbol:
 # Place families in the intersection grids
 for point in gridsIntersection:
 	familyPlaced = doc.Create.NewFamilyInstance(point, familyToPlace, Structure.StructuralType.NonStructural)
-
 
 print(gridsIntersection)
