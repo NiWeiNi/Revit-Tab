@@ -12,7 +12,8 @@ import clr
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
-                            Transaction, TransactionGroup, ElementId, PrintManager
+                            Transaction, TransactionGroup, ElementId, PrintManager, \
+							PrintSetting, ViewSet
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
@@ -97,30 +98,38 @@ for s in sheetsCollector:
 	if s.GetCurrentRevision() != ElementId.InvalidElementId and doc.GetElement(s.GetCurrentRevision()).RevisionDate == revDate:
 		rev = doc.GetElement(s.GetCurrentRevision())
 		sheets.append(s)
-		print s.Name
 
 # Collect all print settings from document
+printSettingCollector = FilteredElementCollector(doc).OfClass(PrintSetting)
+
+# function to pick printSetting by Name
+def pickPrintSetting(name):
+	for p in printSettingCollector:
+		if p.Name == name:
+			return p
 
 # Function to print
-def printSheet(sheets, printRange, printerName, combined, filePath, printSetting):
+def printSheet(sheets, printerName, combined, filePath, printSettingName):
 	# Create view set
-	viewset.Insert(sheets)
+	viewSet = ViewSet()
+	for s in sheets:
+		viewSet.Insert(s)
 
 	# Set print range
 	printManager = doc.PrintManager
-	printmanager.PrintRange = printRange
-	printmanager.Apply()
+	printManager.PrintRange = printManager.PrintRange.Select
+	printManager.Apply()
 
 	# Define current view set as current
 	viewSheetSetting = printManager.ViewSheetSetting
 	viewSheetSetting.CurrentViewSheetSet.Views = viewSet
 
 	# Set printer
-	printerManager.SelectNewprintDriver(printername)
+	printManager.SelectNewPrintDriver(printerName)
 	printManager.Apply()
 
 	# Print to file
-	printerManager.CombinedFile = combined
+	printManager.CombinedFile = combined
 	printManager.Apply()
 	printManager.PrintToFile = True
 	printManager.Apply()
@@ -131,9 +140,12 @@ def printSheet(sheets, printRange, printerName, combined, filePath, printSetting
 
 	# Set print setting
 	printSetup = printManager.PrintSetup
-	printSetup.CurrentPrintSetting = printSetting
-	printmanager.Apply()
+	printSetup.CurrentPrintSetting = pickPrintSetting(printSettingName)
+	printManager.Apply()
 
+
+# Print sheets
+printSheet(sheets, "Adobe PDF", True, "C:\Users\Snoopy\Desktop\pe.pdf", "A1")
 
 """
 # Create a Transaction group to group all subsequent transactions
