@@ -102,7 +102,7 @@ for s in sheetsCollector:
 # Collect all print settings from document
 printSettingCollector = FilteredElementCollector(doc).OfClass(PrintSetting)
 
-# function to pick printSetting by Name
+# Function to pick printSetting by Name
 def pickPrintSetting(name):
 	for p in printSettingCollector:
 		if p.Name == name:
@@ -115,6 +115,8 @@ def printSheet(sheets, printerName, combined, filePath, printSettingName):
 	for s in sheets:
 		viewSet.Insert(s)
 
+	print viewSet
+
 	# Set print range
 	printManager = doc.PrintManager
 	printManager.PrintRange = printManager.PrintRange.Select
@@ -123,6 +125,7 @@ def printSheet(sheets, printerName, combined, filePath, printSettingName):
 	# Define current view set as current
 	viewSheetSetting = printManager.ViewSheetSetting
 	viewSheetSetting.CurrentViewSheetSet.Views = viewSet
+	#viewSheetSetting.SaveAs("MyViewSet")
 
 	# Set printer
 	printManager.SelectNewPrintDriver(printerName)
@@ -143,10 +146,19 @@ def printSheet(sheets, printerName, combined, filePath, printSettingName):
 	printSetup.CurrentPrintSetting = pickPrintSetting(printSettingName)
 	printManager.Apply()
 
+	# Submit to printer
+	printManager.SubmitPrint()
+
+# Create a individual transaction
+t = Transaction(doc, "Print")
+# Start transaction
+t.Start()
 
 # Print sheets
 printSheet(sheets, "Adobe PDF", True, "C:\Users\Snoopy\Desktop\pe.pdf", "A1")
 
+# Commit transaction
+t.Commit()
 """
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Update Drawn By and Checked By")
