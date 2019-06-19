@@ -22,6 +22,9 @@ clr.AddReference('System.Drawing')
 from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox
 
+# Import os
+import os
+
 """
 # Create a class form
 class CreateWindow(Form):
@@ -111,6 +114,11 @@ for s in sheets:
 	pdfName = directory + "\\" + number + " - " + name + "[" + revision + "]" + ".pdf"
 	outName.append(pdfName)
 
+# Check if there is files with same name and clean them
+for file in outName:
+	if os.path.exists(file):
+		os.remove(file)
+
 # Collect all print settings from document
 printSettingCollector = FilteredElementCollector(doc).OfClass(PrintSetting)
 
@@ -120,11 +128,13 @@ def pickPrintSetting(name):
 		if p.Name == name:
 			return p
 
+# Create ViewSet
+viewSet = ViewSet()
+#for sheet in sheets:
+	#viewSet.Insert(sheet)
+
 # Function to print
-def printSheet(sheet, printerName, combined, filePath, printSettingName):
-	# Create view set
-	viewSet = ViewSet()
-	viewSet.Insert(sheet)
+def printSheet(viewSet, printerName, combined, filePath, printSettingName):
 
 	# Set print range
 	printManager = doc.PrintManager
@@ -169,8 +179,21 @@ t = Transaction(doc, "Print")
 t.Start()
 
 # Print sheets
+printedSheets = []
+failedSheets = []
+i = 0
 for sheet, fileName in zip(sheets, outName):
-	printSheet(sheet, "PDF24", True, fileName , "A1")
+	viewSet = ViewSet()
+	viewSet.Insert(sheet)
+	try:
+		printSheet(viewSet, "PDF24", True, fileName , "A1")
+		printedSheets.append(sheet)
+		print sheet.Name
+		for v in viewSet:
+			print v.Name
+	except:
+		failedSheets.append(sheet)
+	i += 1
 
 # Commit transaction
 t.Commit()
