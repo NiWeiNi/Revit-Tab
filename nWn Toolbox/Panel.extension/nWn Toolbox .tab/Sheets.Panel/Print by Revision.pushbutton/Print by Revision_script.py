@@ -12,7 +12,7 @@ import clr
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
-                            Transaction, TransactionGroup, ElementId
+                            Transaction, TransactionGroup, ElementId, PrintManager
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
@@ -94,9 +94,46 @@ sheets = []
 
 # Get curent revision on sheets
 for s in sheetsCollector:
-	if s.GetCurrentRevision() != ElementId.InvalidElementId and doc.GetElement(s.GetCurrentRevision()).RevisionDate:
+	if s.GetCurrentRevision() != ElementId.InvalidElementId and doc.GetElement(s.GetCurrentRevision()).RevisionDate == revDate:
 		rev = doc.GetElement(s.GetCurrentRevision())
 		sheets.append(s)
+		print s.Name
+
+# Collect all print settings from document
+
+# Function to print
+def printSheet(sheets, printRange, printerName, combined, filePath, printSetting):
+	# Create view set
+	viewset.Insert(sheets)
+
+	# Set print range
+	printManager = doc.PrintManager
+	printmanager.PrintRange = printRange
+	printmanager.Apply()
+
+	# Define current view set as current
+	viewSheetSetting = printManager.ViewSheetSetting
+	viewSheetSetting.CurrentViewSheetSet.Views = viewSet
+
+	# Set printer
+	printerManager.SelectNewprintDriver(printername)
+	printManager.Apply()
+
+	# Print to file
+	printerManager.CombinedFile = combined
+	printManager.Apply()
+	printManager.PrintToFile = True
+	printManager.Apply()
+
+	# Set destination filepath
+	printManager.PrintToFileName = filePath
+	printManager.Apply()
+
+	# Set print setting
+	printSetup = printManager.PrintSetup
+	printSetup.CurrentPrintSetting = printSetting
+	printmanager.Apply()
+
 
 """
 # Create a Transaction group to group all subsequent transactions
