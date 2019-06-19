@@ -84,6 +84,9 @@ app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Path to ssave the pdfs
+directory = "C:\Users\Snoopy\Desktop"
+
 # Collects all sheets in current document
 sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets)
 
@@ -93,11 +96,20 @@ revDate = "Date 1"
 # Variable to store sheets with revisions
 sheets = []
 
-# Get curent revision on sheets
+# Get curent revision on sheets and collect sheets
 for s in sheetsCollector:
 	if s.GetCurrentRevision() != ElementId.InvalidElementId and doc.GetElement(s.GetCurrentRevision()).RevisionDate == revDate:
 		rev = doc.GetElement(s.GetCurrentRevision())
 		sheets.append(s)
+
+# Retrieve sheets number, name and revision
+outName = []
+for s in sheets:
+	number = s.SheetNumber
+	name = s.Name
+	revision = s.GetRevisionNumberOnSheet(doc.GetElement(s.GetCurrentRevision()).Id)
+	pdfName = directory + "\\" + number + " - " + name + "[" + revision + "]" + ".pdf"
+	outName.append(pdfName)
 
 # Collect all print settings from document
 printSettingCollector = FilteredElementCollector(doc).OfClass(PrintSetting)
@@ -109,13 +121,10 @@ def pickPrintSetting(name):
 			return p
 
 # Function to print
-def printSheet(sheets, printerName, combined, filePath, printSettingName):
+def printSheet(sheet, printerName, combined, filePath, printSettingName):
 	# Create view set
 	viewSet = ViewSet()
-	for s in sheets:
-		viewSet.Insert(s)
-
-	print viewSet
+	viewSet.Insert(sheet)
 
 	# Set print range
 	printManager = doc.PrintManager
@@ -149,58 +158,24 @@ def printSheet(sheets, printerName, combined, filePath, printSettingName):
 	# Submit to printer
 	printManager.SubmitPrint()
 
+# Create a Transaction group to group all subsequent transactions
+tg = TransactionGroup(doc, "Update Drawn By and Checked By")
+# Start the group transaction
+tg.Start()
+
 # Create a individual transaction
 t = Transaction(doc, "Print")
 # Start transaction
 t.Start()
 
 # Print sheets
-printSheet(sheets, "Adobe PDF", True, "C:\Users\Snoopy\Desktop\pe.pdf", "A1")
+for sheet, fileName in zip(sheets, outName):
+	printSheet(sheet, "PDF24", True, fileName , "A1")
 
 # Commit transaction
-t.Commit()
-"""
-# Create a Transaction group to group all subsequent transactions
-tg = TransactionGroup(doc, "Update Drawn By and Checked By")
-
-# Start the group transaction
-tg.Start()
-
-# Create a individual transaction to change the parameters on sheet
-t = Transaction(doc, "Change Sheets Name")
-
-# Start individual transaction
-t.Start()
-
-# Variable to store modified sheets
-modSheets = list()
-
-# Define function to modify parameter
-def modParameter(param, checkEmpty, inputParam):
-    # Store the sheet number parameter in variable
-    sheetNumber = sheet.LookupParameter("Sheet Number").AsString()
-    # Retrieve sheet parameter
-    sheetDrawn = sheet.LookupParameter(param)
-    # Check if it is by default and input is not empty, set it with user input
-    if sheetDrawn.AsString() == checkEmpty and inputParam != "":
-        sheetDrawn.Set(inputParam)
-        # Check if the sheet has been previously modified and append to list
-        if sheetNumber not in modSheets:
-            modSheets.append(sheetNumber)
-
-# Loop through all sheets
-for sheet in sheetsCollector:
-    # Run function to modify Drawer
-    modParameter("Drawn By", "Author", nameDrawer)
-    # Call function to modify Checker
-    modParameter("Checked By", "Checker", nameChecker)
-
-# Commit individual transaction
 t.Commit()
 
 # Combine all individual transaction in the group transaction
 tg.Assimilate()
 
-# Print all changed sheets
-print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
-"""
+# Print all printed sheets
