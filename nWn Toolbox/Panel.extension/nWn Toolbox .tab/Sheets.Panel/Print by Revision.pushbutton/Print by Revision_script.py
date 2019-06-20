@@ -118,7 +118,7 @@ for s in sheets:
 	outName.append(pdfName)
 	finalName.append(finalPdfName)
 
-# Check if there is files with same name and clean them
+# Check if there are files with same name and clean them
 for file in outName:
 	if os.path.exists(file):
 		os.remove(file)
@@ -169,7 +169,7 @@ def printSheet(sheet, printerName, combined, filePath, printSettingName):
 	# Submit to printer
 	printManager.SubmitPrint()
 
-	# Delete Current viewSheetSettings to allow new setting
+	# Delete Current viewSheetSettings to allow new setting to be stored
 	viewSheetSetting.Delete()
 
 # Create a Transaction group to group all subsequent transactions
@@ -205,7 +205,7 @@ def moveFiles(origin, destination):
 
 # Set timer to call function and Move files to final destination
 timeToPrint = 4
-sleep(len(outName) * 4)
+sleep(len(outName) * timeToPrint)
 moveFiles(outName, finalName)
 
 # Function to display result to user
