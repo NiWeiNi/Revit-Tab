@@ -20,10 +20,13 @@ clr.AddReference('System.Windows.Forms')
 clr.AddReference('System.Drawing')
 
 from System.Drawing import Point, Size
-from System.Windows.Forms import Application, Button, Form, Label, TextBox
+from System.Windows.Forms import Application, Button, Form, Label, TextBox, FolderBrowserDialog, DialogResult
 
 # Import os, shutil to move files
 import os, shutil
+
+# Import sleep for moving files after printing
+from time import sleep
 
 # Create a class form
 class CreateWindow(Form):
@@ -45,7 +48,7 @@ class CreateWindow(Form):
 		# Create TextBox for input
 		self.textboxDiv = TextBox()
 		self.textboxDiv.Parent = self
-		self.textboxDiv.Text = "Name"
+		self.textboxDiv.Text = "01/22/2019"
 		self.textboxDiv.Location = Point(300, 20)
 	
 		# Create button
@@ -66,33 +69,33 @@ class CreateWindow(Form):
 			except:
 				self.Close()
 
-# Call the CreateWindow class and create the input for Drawer
-formDrawer = CreateWindow("Change Parameter Drawn By", "Drawn by")
-Application.Run(formDrawer)
+# Path to save the pdfs by default
+directory = "C:\Users\Snoopy\Desktop"
+
+# Function to create Windows folder browser
+def windBrowser():
+    # Create folder browser window 
+    dialog = FolderBrowserDialog()
+    # Record for user action and store selected path
+    if (dialog.ShowDialog() == DialogResult.OK):
+        return dialog.SelectedPath
+
+# Call windBrowser to select folder with backup files and store path to var
+finalDirectory = windBrowser()
+
+# Call the CreateWindow class and create the input for Revision Date
+formRevision = CreateWindow("Revision Date on Sheets to Print", "Input Revision Date")
+Application.Run(formRevision)
 
 # Assign the input to variable
-nameDrawer = formDrawer.value
-
-# Call the CreateWindow class and create the input for Checker
-formChecker = CreateWindow("Change Parameter Checked By", "Checked by")
-Application.Run(formChecker)
-
-# Assign the input to variable
-nameChecker = formChecker.value
+revDate = formRevision.value
 
 # Store current document to variable
-app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
-# Path to ssave the pdfs
-directory = "C:\Users\Snoopy\Desktop"
-
 # Collects all sheets in current document
 sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets)
-
-# Revision date to print
-revDate = "Date 1"
 
 # Variable to store sheets with revisions
 sheets = []
@@ -105,12 +108,15 @@ for s in sheetsCollector:
 
 # Retrieve sheets number, name and revision
 outName = []
+finalName = []
 for s in sheets:
 	number = s.SheetNumber
 	name = s.Name
 	revision = s.GetRevisionNumberOnSheet(doc.GetElement(s.GetCurrentRevision()).Id)
 	pdfName = directory + "\\" + number + " - " + name + "[" + revision + "]" + ".pdf"
+	finalPdfName = finalDirectory + "\\" + number + " - " + name + "[" + revision + "]" + ".pdf"
 	outName.append(pdfName)
+	finalName.append(finalPdfName)
 
 # Check if there is files with same name and clean them
 for file in outName:
