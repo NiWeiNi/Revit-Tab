@@ -172,13 +172,8 @@ def printSheet(sheet, printerName, combined, filePath, printSettingName):
 	# Delete Current viewSheetSettings to allow new setting to be stored
 	viewSheetSetting.Delete()
 
-# Create a Transaction group to group all subsequent transactions
-tg = TransactionGroup(doc, "Batch Print")
-# Start the group transaction
-tg.Start()
-
 # Create a individual transaction
-t = Transaction(doc, "Print")
+t = Transaction(doc, "Batch Print")
 # Start transaction
 t.Start()
 
@@ -188,15 +183,12 @@ failedSheets = []
 for sheet, fileName in zip(sheets, outName):
 	try:
 		printSheet(sheet, "PDF24", True, fileName, "A3")
-		printedSheets.append(sheet.Name)
+		printedSheets.append(sheet.SheetNumber)
 	except:
 		failedSheets.append(fileName)
 
 # Commit transaction
 t.Commit()
-
-# Combine all individual transaction in the group transaction
-tg.Assimilate()
 
 # Function to Move Files
 def moveFiles(origin, destination):
@@ -217,4 +209,4 @@ def printMessage(resultList, message, messageWarning):
         print(messageWarning)
 
 # Print message
-printMessage(printedSheets, "The following sheets have been pdf:", "No file has been pdf.") 
+printMessage(printedSheets, "The following sheets have been printed:", "No file has been printed.") 
