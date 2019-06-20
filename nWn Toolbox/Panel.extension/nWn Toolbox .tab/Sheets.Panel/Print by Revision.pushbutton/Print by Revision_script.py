@@ -200,6 +200,16 @@ t.Commit()
 # Combine all individual transaction in the group transaction
 tg.Assimilate()
 
+# Function to Move Files
+def moveFiles(origin, destination):
+	for fileName, finalDestination in zip(outName, finalName):
+		shutil.move(fileName, finalDestination)
+
+# Set timer to call function and Move files to final destination
+timeToPrint = 4
+sleep(len(outName) * 4)
+moveFiles(outName, finalName)
+
 # Function to display result to user
 def printMessage(resultList, message, messageWarning):
     if len(resultList) != 0:
