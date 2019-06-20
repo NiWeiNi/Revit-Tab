@@ -126,13 +126,8 @@ def pickPrintSetting(name):
 		if p.Name == name:
 			return p
 
-# Create ViewSet
-viewSet = ViewSet()
-#for sheet in sheets:
-	#viewSet.Insert(sheet)
-
 # Function to print
-def printSheet(viewSet, printerName, combined, filePath, printSettingName):
+def printSheet(sheet, printerName, combined, filePath, printSettingName):
 
 	# Set print range
 	printManager = doc.PrintManager
@@ -140,9 +135,11 @@ def printSheet(viewSet, printerName, combined, filePath, printSettingName):
 	printManager.Apply()
 
 	# Define current view set as current
+	viewSet = ViewSet()
+	viewSet.Insert(sheet)
 	viewSheetSetting = printManager.ViewSheetSetting
 	viewSheetSetting.CurrentViewSheetSet.Views = viewSet
-	#viewSheetSetting.SaveAs("MyViewSet")
+	viewSheetSetting.SaveAs("Current Print")
 
 	# Set printer
 	printManager.SelectNewPrintDriver(printerName)
@@ -166,6 +163,9 @@ def printSheet(viewSet, printerName, combined, filePath, printSettingName):
 	# Submit to printer
 	printManager.SubmitPrint()
 
+	# Delete Current viewSheetSettings to allow new setting
+	viewSheetSetting.Delete()
+
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Batch Print")
 # Start the group transaction
@@ -179,20 +179,12 @@ t.Start()
 # Print sheets
 printedSheets = []
 failedSheets = []
-i = 0
 for sheet, fileName in zip(sheets, outName):
-	viewSet = ViewSet()
-	viewSet.Insert(sheet)
-	print viewSet
 	try:
-		printSheet(viewSet, "PDF24", True, fileName , "A1")
-		printedSheets.append(sheet)
-		print sheet.Name
-		for v in viewSet:
-			print v.Name
+		printSheet(sheet, "PDF24", True, fileName, "A3")
+		printedSheets.append(sheet.Name)
 	except:
-		failedSheets.append(sheet)
-	i += 1
+		failedSheets.append(fileName)
 
 # Commit transaction
 t.Commit()
