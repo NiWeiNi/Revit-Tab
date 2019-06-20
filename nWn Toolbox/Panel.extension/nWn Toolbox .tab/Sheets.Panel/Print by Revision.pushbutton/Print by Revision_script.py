@@ -2,8 +2,8 @@
 """Print all sheets with a specified revision date. 
 
 NOTE: 
-Name of the files will be sheet name and appended revision.
-Existing files will be overridden."""
+Name of the files will be sheet number, name and appended revision.
+Existing files will be overwritten."""
 __title__ = 'Print by\nRev Date'
 __author__ = "nWn"
 
@@ -22,10 +22,9 @@ clr.AddReference('System.Drawing')
 from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox
 
-# Import os
-import os
+# Import os, shutil to move files
+import os, shutil
 
-"""
 # Create a class form
 class CreateWindow(Form):
 	def __init__(self, title, author):
@@ -81,7 +80,6 @@ Application.Run(formChecker)
 # Assign the input to variable
 nameChecker = formChecker.value
 
-"""
 # Store current document to variable
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
@@ -169,7 +167,7 @@ def printSheet(viewSet, printerName, combined, filePath, printSettingName):
 	printManager.SubmitPrint()
 
 # Create a Transaction group to group all subsequent transactions
-tg = TransactionGroup(doc, "Update Drawn By and Checked By")
+tg = TransactionGroup(doc, "Batch Print")
 # Start the group transaction
 tg.Start()
 
@@ -185,6 +183,7 @@ i = 0
 for sheet, fileName in zip(sheets, outName):
 	viewSet = ViewSet()
 	viewSet.Insert(sheet)
+	print viewSet
 	try:
 		printSheet(viewSet, "PDF24", True, fileName , "A1")
 		printedSheets.append(sheet)
@@ -201,4 +200,13 @@ t.Commit()
 # Combine all individual transaction in the group transaction
 tg.Assimilate()
 
-# Print all printed sheets
+# Function to display result to user
+def printMessage(resultList, message, messageWarning):
+    if len(resultList) != 0:
+        print(message)
+        print("\n".join(resultList))
+    else:
+        print(messageWarning)
+
+# Print message
+printMessage(printedSheets, "The following sheets have been pdf:", "No file has been pdf.") 
