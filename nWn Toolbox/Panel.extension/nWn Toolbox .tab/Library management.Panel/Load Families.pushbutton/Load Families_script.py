@@ -57,7 +57,7 @@ familiesList = retrieveFamilies(directory)
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
-# Class to define loading options, in 
+# Class to define loading options
 class familyLoadOptions(IFamilyLoadOptions):
 	def __init__(self, overwrite):
 		self.bool = overwrite
