@@ -31,8 +31,11 @@ TaskDialog.Show("Select elements", "Select elements from categories to isolate")
 objType = ObjectType.Element
 selection = uidoc.Selection.PickObjects(objType, "Pick elements to isolate with transparency")
 
+# Store categories of the selected elements
+categories = []
 for e in selection:
-	print doc.GetElement(e.ElementId).Name
+	cat = doc.GetElement(e.ElementId).Category
+	categories.append(cat)
 
 # Override tranparency settings
 overtransparency = OverrideGraphicSettings()
@@ -45,10 +48,11 @@ t.Start()
 
 # Override all categories transparency
 for c in docCat:
-	try:
-		activeView.SetCategoryOverrides(c.Id, overtransparency)
-	except:
-		pass
+	if c not in categories:
+		try:
+			activeView.SetCategoryOverrides(c.Id, overtransparency)
+		except:
+			pass
 
 # Commit transaction
 t.Commit()
