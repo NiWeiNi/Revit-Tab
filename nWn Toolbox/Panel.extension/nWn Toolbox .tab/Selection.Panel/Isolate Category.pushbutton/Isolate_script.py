@@ -8,8 +8,7 @@ __author__ = "nWn"
 import clr
 
 # Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
-                            Transaction, TransactionGroup
+from Autodesk.Revit.DB import OverrideGraphicSettings, Transaction, TransactionGroup
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
@@ -84,3 +83,21 @@ activeView = doc.ActiveView
 # Retrieve all categories in the document
 docCat = doc.Settings.Categories
 
+# Override tranparency settings
+overtransparency = OverrideGraphicSettings()
+overtransparency.SetSurfaceTransparency(50)
+
+# Create a individual transaction
+t = Transaction(doc, "Override category visibility")
+# Start individual transaction
+t.Start()
+
+# Override all categories transparency
+for c in docCat:
+	try:
+		activeView.SetCategoryOverrides(c.Id, overtransparency)
+	except:
+		pass
+
+# Commit transaction
+t.Commit()
