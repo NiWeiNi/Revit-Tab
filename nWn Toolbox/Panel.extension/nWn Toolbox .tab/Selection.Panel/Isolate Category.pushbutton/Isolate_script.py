@@ -7,73 +7,14 @@ __author__ = "nWn"
 # Import commom language runtime
 import clr
 
+# Import Revit UI
+from Autodesk.Revit.UI.Selection import ObjectType
+from Autodesk.Revit.UI import TaskDialog
+
 # Import Revit DB
-from Autodesk.Revit.DB import OverrideGraphicSettings, Transaction, TransactionGroup
+from Autodesk.Revit.DB import OverrideGraphicSettings, Transaction
 
-# Import libraries to enable Windows forms
-clr.AddReference('System.Windows.Forms')
-clr.AddReference('System.Drawing')
-"""
-from System.Drawing import Point, Size
-from System.Windows.Forms import Application, Button, Form, Label, TextBox
-
-# Create a class form
-class CreateWindow(Form):
-	def __init__(self, title, author):
-		# Create the form
-		self.Name = "Create Window"
-		self.Text = title
-		self.Size = Size(500, 150)
-		self.CenterToScreen()
-		
-		self.value = ""
-		
-		# Create label for input title
-		labelDiv = Label(Text = author + ":")
-		labelDiv.Parent = self
-		labelDiv.Size = Size(100, 150)
-		labelDiv.Location = Point(30, 20)
-		
-		# Create TextBox for input
-		self.textboxDiv = TextBox()
-		self.textboxDiv.Parent = self
-		self.textboxDiv.Text = "Name"
-		self.textboxDiv.Location = Point(300, 20)
-	
-		# Create button
-		button = Button()
-		button.Parent = self
-		button.Text = "Ok"
-		button.Location = Point(300, 60)
-		
-		# Register event
-		button.Click += self.ButtonClicked
-		
-	def ButtonClicked(self, sender, args):
-		if sender.Click:
-			# Handle non numeric cases
-			try:
-				self.value = self.textboxDiv.Text
-				self.Close()
-			except:
-				self.Close()
-
-# Call the CreateWindow class and create the input for Drawer
-formDrawer = CreateWindow("Change Parameter Drawn By", "Drawn by")
-Application.Run(formDrawer)
-
-# Assign the input to variable
-nameDrawer = formDrawer.value
-
-# Call the CreateWindow class and create the input for Checker
-formChecker = CreateWindow("Change Parameter Checked By", "Checked by")
-Application.Run(formChecker)
-
-# Assign the input to variable
-nameChecker = formChecker.value
-"""
 # Store current document to variable
-app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
@@ -82,6 +23,16 @@ activeView = doc.ActiveView
 
 # Retrieve all categories in the document
 docCat = doc.Settings.Categories
+
+# Show task dialog to inform user
+TaskDialog.Show("Select elements", "Select elements from categories to isolate")
+
+# Select elements
+objType = ObjectType.Element
+selection = uidoc.Selection.PickObjects(objType, "Pick elements to isolate with transparency")
+
+for e in selection:
+	print doc.GetElement(e.ElementId).Name
 
 # Override tranparency settings
 overtransparency = OverrideGraphicSettings()
