@@ -34,8 +34,17 @@ selection = uidoc.Selection.PickObjects(objType, "Pick elements to isolate with 
 # Store categories of the selected elements
 categories = []
 for e in selection:
-	cat = doc.GetElement(e.ElementId).Category
-	categories.append(cat)
+	elem = doc.GetElement(e.ElementId)
+	cat = doc.GetElement(e.ElementId).Category.Name
+	# Check if element is group or assembly to extract elements
+	if cat == "Assemblies" or cat == "Model Groups":
+		ids = elem.GetMemberIds()
+		# Get elements category inside groups or assemblies
+		for id in ids:
+			catsub = doc.GetElement(id).Category.Name
+			categories.append(catsub)
+	else:
+		categories.append(cat)
 
 # Override tranparency settings
 overtransparency = OverrideGraphicSettings()
@@ -48,7 +57,7 @@ t.Start()
 
 # Override all categories transparency
 for c in docCat:
-	if c not in categories:
+	if c.Name not in categories:
 		try:
 			activeView.SetCategoryOverrides(c.Id, overtransparency)
 		except:
