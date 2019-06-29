@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-"""Isolates a category from selected and enters in isolated view mode.
+"""Removes all unused links.
+
+NOTE: Includes images, CAD Links and Revit Links.
 """
-__title__ = 'Isolate\nCategory'
+__title__ = 'Remove Unused\nLinks'
 __author__ = "nWn"
 
 # Import commom language runtime
 import clr
 
 # Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
+from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
                             Transaction, TransactionGroup
 
 # Import libraries to enable Windows forms
 clr.AddReference('System.Windows.Forms')
 clr.AddReference('System.Drawing')
+
+
 """
 from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox
@@ -79,10 +83,13 @@ doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Collects all sheets in current document
-sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets) \
-                                                .ToElements()
+linksCollector = FilteredElementCollector(doc).OfClass(ImportInstance).ToElements()
+
+for e in linksCollector:
+	print e.Name
 
 
+"""
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Update Drawn By and Checked By")
 
@@ -126,3 +133,5 @@ tg.Assimilate()
 
 # Print all changed sheets
 print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
+
+	"""
