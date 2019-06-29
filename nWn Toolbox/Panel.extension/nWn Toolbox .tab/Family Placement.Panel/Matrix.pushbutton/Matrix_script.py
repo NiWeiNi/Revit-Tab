@@ -1,33 +1,17 @@
 # -*- coding: utf-8 -*-
+"""Places elements along a curve.
+
+NOTE: The division will be in equal parts.
+"""
+__title__ = 'Remove Unused\nLinks'
+__author__ = "nWn"
 
 # Import commom language runtime
 import clr
 
-from Autodesk.Revit import DB
-from Autodesk.Revit import UI
-
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-from Autodesk.Revit.DB.Structure import *
-
-clr.AddReference('ProtoGeometry')
-from Autodesk.DesignScript.Geometry import *
-
-clr.AddReference('RevitAPIUI')
-from Autodesk.Revit.UI import *
-
-clr.AddReference('System')
-from System.Collections.Generic import List
-
-clr.AddReference('RevitNodes')
-import Revit
-clr.ImportExtensions(Revit.GeometryConversion)
-clr.ImportExtensions(Revit.Elements)
-
-clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
+# Import Revit DB
+from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
+                            Transaction, TransactionGroup
 
 # Import modules to create windows dialogues in Revit for user input
 clr.AddReference('System.Windows.Forms')
@@ -38,6 +22,7 @@ from System.Drawing import *
 # Import math module
 import math
 
+# Store current document to variable
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
