@@ -17,8 +17,8 @@ from Autodesk.Revit.UI.Selection import ObjectType, ISelectionFilter
 from Autodesk.Revit.UI import TaskDialog
 
 # Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
-                            Transaction, TransactionGroup
+from Autodesk.Revit.DB import DividedPath, Transaction, TransactionGroup,\
+							FilteredElementCollector, FamilySymbol, Structure, ImportInstance, BuiltInCategory
 
 # Import modules to create windows dialogues in Revit for user input
 clr.AddReference('System.Windows.Forms')
@@ -49,6 +49,47 @@ class CustomISelectionFilter(ISelectionFilter):
 objType = ObjectType.Element
 selCurve = uidoc.Selection.PickObjects(objType, "Pick elements to isolate with transparency")
 
-# Convert the reference element into a curve
-curve = doc.GetElement(selCurve[0].ElementId)
-print curve
+# Convert the reference element into a geometry curve
+curve = doc.GetElement(selCurve[0].ElementId).GeometryCurve
+
+# Tessellate curve to get points
+tesseCurve = curve.Tessellate()
+
+# Retrieve end point of curve
+endPoint = curve.GetEndPoint(0)
+
+# List to store division points
+finalPoints = []
+stepsize = 50
+dist = 0
+
+# Create equal distance points
+for p in tesseCurve:
+	if len(finalPoints) == 0:
+		finalPoints.append(endPoint)
+	else:
+		dist += endPoint.DistanceTo(p)
+		if dist > stepsize:
+			finalPoints.append(p)
+			dist = 0
+		endPoint = p
+
+# Retrieve family to place on points
+markingSymbol = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
+markingSymbol.OfClass(FamilySymbol).ToElements()
+
+cogSymbol = markingSymbol.FirstElement()
+for element in markingSymbol:
+	if element.FamilyName == "CoG":
+		cogSymbol = element
+
+# Create a individual transaction
+t = Transaction(doc, "Divide curve")
+# Start individual transaction
+t.Start()
+
+for p in finalPoints:
+	doc.Create.NewFamilyInstance(p, cogSymbol, Structure.StructuralType.NonStructural)
+
+# Commit transaction
+t.Commit()
