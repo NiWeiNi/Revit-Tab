@@ -1,67 +1,40 @@
 # -*- coding: utf-8 -*-
-"""Place families in the grids intersections.
-
-Note:
-Allows placement of any family in the grids intersections."""
-__title__ = 'At Grids\nIntersection'
+"""Dimension grids.
+"""
+__title__ = 'Dimension\nGrids'
 __author__ = "nWn"
+
 # Import commom language runtime
 import clr
-# from Autodesk.Revit.UI import *
+# Import Revit API
 from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
-							BuiltInCategory, IntersectionResultArray, Transaction, \
+							BuiltInCategory, ReferenceArray, Reference, Transaction, \
 							TransactionGroup, FamilySymbol, Structure
+# Import Revit API
+from Autodesk.Revit.Creation import ItemFactoryBase
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
+
+# Get current view
+view = doc.ActiveView
 
 # Select all grids by filter
 gridsFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
 gridsCollector = FilteredElementCollector(doc).WherePasses(gridsFilter) \
 				.WhereElementIsNotElementType()
 
-for g in gridsCollector:
-	print(g)
 # Variables to split grids into columns and rows
-gridsColumn = []
-gridsRow = []
+gridsColumn = ReferenceArray()
+gridsRow = ReferenceArray()
 
-# Check grids name
+# Check grids name and split in groups
 for grid in gridsCollector:
 	gridName = grid.LookupParameter("Name").AsString()
 	if any(char.isdigit() for char in gridName):
-		gridsColumn.append(grid)
+		gridsColumn.Append(Reference(grid))
 	else:
-		gridsRow.append(grid)
+		gridsRow.Append(Reference(grid))
 
-# Variables to store grids Name and intersection points
-gridsPair = []
-gridsIntersection = []
-
-# Create IntersectionArray object
-interRes = clr.Reference[IntersectionResultArray]()
-
-# Check for intersections and append grids names as pairs and intersection points
-for gC in gridsColumn:
-	for gR in gridsRow:
-		inter = gC.Curve.Intersect(gR.Curve, interRes)
-		gCName = gC.LookupParameter("Name").AsString()
-		gRName = gR.LookupParameter("Name").AsString()
-		gridsPair.append((gCName, gRName))
-		gridsIntersection.append(interRes.Item[0].XYZPoint)
-
-# Select family to place in intersections
-markingSymbol = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
-markingSymbol.OfClass(FamilySymbol).ToElements()
-
-familyToPlace = markingSymbol.FirstElement()
-for element in markingSymbol:
-	if element.FamilyName == "CoG":
-		cogSymbol = element
-
-# Place families in the intersection grids
-for point in gridsIntersection:
-	familyPlaced = doc.Create.NewFamilyInstance(point, familyToPlace, Structure.StructuralType.NonStructural)
-
-print(gridsIntersection)
+# Create dimensions
