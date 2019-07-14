@@ -3,7 +3,7 @@
 
 NOTE: The division will be in equal parts.
 """
-__title__ = 'Remove Unused\nLinks'
+__title__ = 'Matrix\nCurve'
 __author__ = "nWn"
 
 # Import commom language runtime
