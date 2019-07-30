@@ -22,7 +22,7 @@ doc = __revit__.ActiveUIDocument.Document
 
 # Collects elements
 furnitureCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Furniture) \
-                                                .WhereElementIsNotElementType().ToElements()
+                                                .WhereElementIsNotElementType()
 
 # Collect phases
 phases = doc.Phases
