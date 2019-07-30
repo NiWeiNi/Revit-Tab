@@ -13,77 +13,38 @@ import clr
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
                             Transaction, TransactionGroup
 
-# Import libraries to enable Windows forms
-clr.AddReference('System.Windows.Forms')
-clr.AddReference('System.Drawing')
-
-from System.Drawing import Point, Size
-from System.Windows.Forms import Application, Button, Form, Label, TextBox
-
-# Create a class form
-class CreateWindow(Form):
-	def __init__(self, title, author):
-		# Create the form
-		self.Name = "Create Window"
-		self.Text = title
-		self.Size = Size(500, 150)
-		self.CenterToScreen()
-		
-		self.value = ""
-		
-		# Create label for input title
-		labelDiv = Label(Text = author + ":")
-		labelDiv.Parent = self
-		labelDiv.Size = Size(100, 150)
-		labelDiv.Location = Point(30, 20)
-		
-		# Create TextBox for input
-		self.textboxDiv = TextBox()
-		self.textboxDiv.Parent = self
-		self.textboxDiv.Text = "Name"
-		self.textboxDiv.Location = Point(300, 20)
-	
-		# Create button
-		button = Button()
-		button.Parent = self
-		button.Text = "Ok"
-		button.Location = Point(300, 60)
-		
-		# Register event
-		button.Click += self.ButtonClicked
-		
-	def ButtonClicked(self, sender, args):
-		if sender.Click:
-			# Handle non numeric cases
-			try:
-				self.value = self.textboxDiv.Text
-				self.Close()
-			except:
-				self.Close()
-
-# Call the CreateWindow class and create the input for Drawer
-formDrawer = CreateWindow("Change Parameter Drawn By", "Drawn by")
-Application.Run(formDrawer)
-
-# Assign the input to variable
-nameDrawer = formDrawer.value
-
-# Call the CreateWindow class and create the input for Checker
-formChecker = CreateWindow("Change Parameter Checked By", "Checked by")
-Application.Run(formChecker)
-
-# Assign the input to variable
-nameChecker = formChecker.value
+# Import pyRevit forms
+from pyrevit import forms
 
 # Store current document to variable
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
-uidoc = __revit__.ActiveUIDocument
 
-# Collects all sheets in current document
-sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets) \
-                                                .ToElements()
+# Collects elements
+furnitureCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Furniture) \
+                                                .WhereElementIsNotElementType().ToElements()
 
+# Collect phases
+phases = doc.Phases
+
+# create list of phases names
+phaseNames = []
+for phase in phases:
+	phaseNames.append(phase.Name)
+
+# Create form to select phase
+phasesForm = forms.ask_for_one_item(phaseNames, default=phaseNames[-1], prompt=None, title='Select Phase')
+
+# Retrieve phase object from user selection
+for phase in phases:
+	if phase.Name == phasesForm:
+		phaseObject = phase
+
+# Retrieve room in where the furniture is located
+for f in furnitureCollector:
+	f.Room[phaseObject]
+
+"""
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Update Drawn By and Checked By")
 
@@ -127,3 +88,5 @@ tg.Assimilate()
 
 # Print all changed sheets
 print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
+
+"""
