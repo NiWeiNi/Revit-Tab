@@ -3,7 +3,7 @@
 
 NOTE: Includes images, CAD Links and Revit Links.
 """
-__title__ = 'Remove Unused\nLinks'
+__title__ = 'Clean Unused\nLinks'
 __author__ = "nWn"
 
 # Import commom language runtime
