@@ -11,25 +11,35 @@ import clr
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
-                            Transaction, TransactionGroup
+                            Transaction, TransactionGroup, ElementCategoryFilter
+
+# Import pyRevit forms
+from pyrevit import forms
 
 # Store current document to variable
 app = __revit__.Application
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
-# Retrieve all opened documents that is not the current
-openDocuments = []
+# Select opened documents to transfer View Templates
+selProject = forms.select_open_docs(title="Select project/s to transfer View Templates", button_name='OK', width=500, multiple=True, filterfunc=None)
 
-for openDoc in app.Documents:
-	if openDoc.Title != doc.Title:
-		openDocuments.append(openDoc.Title)
+# Retrieve all View Templates from the selected projects
+viewsFilter = ElementCategoryFilter(BuiltInCategory.OST_Views)
 
+viewTemplates = []
 
+for pro in selProject:
+	viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
+	for view in viewsCollector:
+		if view.IsTemplate == True:
+			viewTemplates.append(view.Name + " - " + pro.Title)
 
-for e in linksCollector:
-	print e.Name
+# Display select view templates form
+vtemplates = forms.SelectFromList.show(viewTemplates, "View Templates", 600, 300, multiselect=True)
 
+for vt in viewTemplates:
+	continue
 
 """
 # Create a Transaction group to group all subsequent transactions
