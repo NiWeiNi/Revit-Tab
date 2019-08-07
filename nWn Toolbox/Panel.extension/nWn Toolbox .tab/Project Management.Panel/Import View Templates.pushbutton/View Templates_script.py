@@ -27,19 +27,24 @@ selProject = forms.select_open_docs(title="Select project/s to transfer View Tem
 # Retrieve all View Templates from the selected projects
 viewsFilter = ElementCategoryFilter(BuiltInCategory.OST_Views)
 
-viewTemplates = []
+viewTemplates = {}
 
 for pro in selProject:
 	viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
 	for view in viewsCollector:
 		if view.IsTemplate == True:
-			viewTemplates.append(view.Name + " - " + pro.Title)
+			viewTemplates[view.Name] = view
 
 # Display select view templates form
-vtemplates = forms.SelectFromList.show(viewTemplates, "View Templates", 600, 300, multiselect=True)
+vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
 
-for vt in viewTemplates:
-	continue
+# Retrieve View Templates to transfer
+fTemplates = []
+for vT in vTemplates:
+	fTemplates.append(viewTemplates[vT])
+
+
+
 
 """
 # Create a Transaction group to group all subsequent transactions
