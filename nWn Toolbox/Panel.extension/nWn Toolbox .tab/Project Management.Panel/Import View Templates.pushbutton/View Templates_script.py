@@ -9,9 +9,12 @@ __author__ = "nWn"
 # Import commom language runtime
 import clr
 
+# Import C# List
+from System.Collections.Generic import List, ICollection
+
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, ElementTransformUtils, BuiltInCategory, \
-                            ElementId, Transform, Transaction, TransactionGroup, ElementCategoryFilter
+                            ElementId, Transform, CopyPasteOptions, Transaction, TransactionGroup, ElementCategoryFilter
 
 # Import pyRevit forms
 from pyrevit import forms
@@ -38,16 +41,31 @@ for pro in selProject:
 # Display select view templates form
 vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
 
+# Function to check if VT is in project
+def checkProject(viewName, project):
+	if project.Title in viewName:
+		return True
+
 # Retrieve View Templates to transfer
-fTemplatesIds = []
+fTemplatesIds = List[ElementId]()
 for vT in vTemplates:
-	fTemplatesIds.append(viewTemplates[vT].Id)
+	fTemplatesIds.Add(viewTemplates[vT].Id)
 
 print fTemplatesIds
+
 # Transform object
 transIdent = Transform.Identity
+copyPasteOpt = CopyPasteOptions()
 
-# ElementTransformUtils.CopyElements(destinationdoc, fTemplatesIds, doc, transIdent,  )
+# Create single transaction and start it
+t = Transaction(doc, "Copy View Templates")
+t.Start()
+
+# Copy the selected View Templates
+ElementTransformUtils.CopyElements(selProject[0], fTemplatesIds, doc, transIdent, copyPasteOpt)
+
+# Commit transaction
+t.Commit()
 
 """
 # Create a Transaction group to group all subsequent transactions
