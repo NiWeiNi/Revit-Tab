@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Import View Templates.
 
-NOTE: Select View Templates to transfer.
+NOTE: Only new View Templates are transferred. Same name VT won't be overriden
 """
 __title__ = 'Import View\nTemplates'
 __author__ = "nWn"
@@ -41,18 +41,6 @@ for pro in selProject:
 # Display select view templates form
 vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
 
-# Function to check if VT is in project
-def checkProject(viewName, project):
-	if project.Title in viewName:
-		return True
-
-# Retrieve View Templates to transfer
-fTemplatesIds = List[ElementId]()
-for vT in vTemplates:
-	fTemplatesIds.Add(viewTemplates[vT].Id)
-
-print fTemplatesIds
-
 # Transform object
 transIdent = Transform.Identity
 copyPasteOpt = CopyPasteOptions()
@@ -61,55 +49,14 @@ copyPasteOpt = CopyPasteOptions()
 t = Transaction(doc, "Copy View Templates")
 t.Start()
 
-# Copy the selected View Templates
-ElementTransformUtils.CopyElements(selProject[0], fTemplatesIds, doc, transIdent, copyPasteOpt)
+# Retrieve View Templates to transfer
+for vT in vTemplates:
+	vTId = List[ElementId]()
+	for pro in selProject:
+		if pro.Title in vT:
+			vTId.Add(viewTemplates[vT].Id)
+			# Copy the selected View Template to current project
+			ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 
 # Commit transaction
 t.Commit()
-
-"""
-# Create a Transaction group to group all subsequent transactions
-tg = TransactionGroup(doc, "Update Drawn By and Checked By")
-
-# Start the group transaction
-tg.Start()
-
-# Create a individual transaction to change the parameters on sheet
-t = Transaction(doc, "Change Sheets Name")
-
-# Start individual transaction
-t.Start()
-
-# Variable to store modified sheets
-modSheets = list()
-
-# Define function to modify parameter
-def modParameter(param, checkEmpty, inputParam):
-    # Store the sheet number parameter in variable
-    sheetNumber = sheet.LookupParameter("Sheet Number").AsString()
-    # Retrieve sheet parameter
-    sheetDrawn = sheet.LookupParameter(param)
-    # Check if it is by default and input is not empty, set it with user input
-    if sheetDrawn.AsString() == checkEmpty and inputParam != "":
-        sheetDrawn.Set(inputParam)
-        # Check if the sheet has been previously modified and append to list
-        if sheetNumber not in modSheets:
-            modSheets.append(sheetNumber)
-
-# Loop through all sheets
-for sheet in sheetsCollector:
-    # Run function to modify Drawer
-    modParameter("Drawn By", "Author", nameDrawer)
-    # Call function to modify Checker
-    modParameter("Checked By", "Checker", nameChecker)
-
-# Commit individual transaction
-t.Commit()
-
-# Combine all individual transaction in the group transaction
-tg.Assimilate()
-
-# Print all changed sheets
-print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
-
-	"""
