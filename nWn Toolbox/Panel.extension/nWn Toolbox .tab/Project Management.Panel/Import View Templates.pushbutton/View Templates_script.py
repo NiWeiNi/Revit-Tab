@@ -10,8 +10,8 @@ __author__ = "nWn"
 import clr
 
 # Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
-                            Transaction, TransactionGroup, ElementCategoryFilter
+from Autodesk.Revit.DB import FilteredElementCollector, ElementTransformUtils, BuiltInCategory, \
+                            ElementId, Transform, Transaction, TransactionGroup, ElementCategoryFilter
 
 # Import pyRevit forms
 from pyrevit import forms
@@ -33,18 +33,21 @@ for pro in selProject:
 	viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
 	for view in viewsCollector:
 		if view.IsTemplate == True:
-			viewTemplates[view.Name] = view
+			viewTemplates[view.Name + " - " + pro.Title] = view
 
 # Display select view templates form
 vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
 
 # Retrieve View Templates to transfer
-fTemplates = []
+fTemplatesIds = []
 for vT in vTemplates:
-	fTemplates.append(viewTemplates[vT])
+	fTemplatesIds.append(viewTemplates[vT].Id)
 
+print fTemplatesIds
+# Transform object
+transIdent = Transform.Identity
 
-
+# ElementTransformUtils.CopyElements(destinationdoc, fTemplatesIds, doc, transIdent,  )
 
 """
 # Create a Transaction group to group all subsequent transactions
