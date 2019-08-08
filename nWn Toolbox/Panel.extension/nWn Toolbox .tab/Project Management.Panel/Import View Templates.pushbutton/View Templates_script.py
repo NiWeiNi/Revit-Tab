@@ -10,7 +10,7 @@ __author__ = "nWn"
 import clr
 
 # Import C# List
-from System.Collections.Generic import List, ICollection
+from System.Collections.Generic import List
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, ElementTransformUtils, BuiltInCategory, \
@@ -56,7 +56,17 @@ for vT in vTemplates:
 		if pro.Title in vT:
 			vTId.Add(viewTemplates[vT].Id)
 			# Copy the selected View Template to current project
-			ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+			et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 
 # Commit transaction
 t.Commit()
+
+# Function to display result to user
+def printMessage(resultList, message):
+	if len(resultList) != 0:
+		print(message)
+		print("\n".join(resultList))
+
+# Print message
+printMessage([], "The following View Templates were transferred:")
+printMessage([], "Non transferred View Templates:")
