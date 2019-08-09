@@ -27,19 +27,36 @@ uidoc = __revit__.ActiveUIDocument
 # Select opened documents to transfer View Templates
 selProject = forms.select_open_docs(title="Select project/s to transfer View Templates", button_name='OK', width=500, multiple=True, filterfunc=None)
 
-# Retrieve all View Templates from the selected projects
+# Filter Views
 viewsFilter = ElementCategoryFilter(BuiltInCategory.OST_Views)
 
-viewTemplates = {}
+# Function to retrieve View Templates
+def retrieveVT(docList):
+	storeDict = {}
+	if isinstance(docList, list):
+		for pro in docList:
+			viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
+			for view in viewsCollector:
+				if view.IsTemplate == True:
+					storeDict[view.Name + " - " + pro.Title] = view
+	else:
+		viewsCollector = FilteredElementCollector(docList).WherePasses(viewsFilter)
+		for view in viewsCollector:
+			if view.IsTemplate == True:
+				storeDict[view.Name + " - " + docList.Title] = view
+	return storeDict
 
-for pro in selProject:
-	viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
-	for view in viewsCollector:
-		if view.IsTemplate == True:
-			viewTemplates[view.Name + " - " + pro.Title] = view
+# Retrieve all view templates from selected docs
+viewTemplates = retrieveVT(selProject)
 
 # Display select view templates form
 vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
+
+# Collect all View Templates in the current document
+docTemplates = retrieveVT(doc)
+
+# Check for duplicate View Templates in the current project
+# TODO
 
 # Transform object
 transIdent = Transform.Identity
