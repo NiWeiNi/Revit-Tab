@@ -55,6 +55,14 @@ vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 6
 # Collect all View Templates in the current document
 docTemplates = retrieveVT(doc)
 
+# Collect all views from the current document
+docViewsCollector = FilteredElementCollector(doc).WherePasses(viewsFilter)
+
+# Check for all views that has a view template
+for v in docViewsCollector:
+	if v.ViewTemplateId != ElementId.InvalidElementId:
+		print v.ViewTemplateId
+
 # Check for duplicate View Templates in the current project
 # TODO
 
