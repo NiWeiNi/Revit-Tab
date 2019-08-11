@@ -104,6 +104,8 @@ t = Transaction(doc, "Copy View Templates")
 t.Start()
 
 # Check for all views that has a view template
+vTIds = []
+viewsWVT = checkViewT(docViewsCollector)
 for vT in vTemplates:
 	vTId = List[ElementId]()
 	for pro in selProject:
@@ -113,18 +115,20 @@ for vT in vTemplates:
 			if vT.replace(" - " + pro.Title, "") not in docTemplates.keys():
 				# Copy the selected View Template to current project
 				# et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+				print vT.replace(" - " + pro.Title, "") not in docTemplates.keys()
 			else:
-				viewsWVT = checkViewT(docViewsCollector)
 				vToApplyVT = []
-				vTIds = []
 				for v in viewsWVT:
-					if v.Name in vT and v.ViewTemplateId not in vTIds:
+					el = doc.GetElement(v.ViewTemplateId)
+					if el.Name in vT and v.ViewTemplateId not in vTIds:
 						vTIds.append(v.ViewTemplateId)
 						vToApplyVT.append(v)
 						doc.Delete(v.ViewTemplateId)
-						# et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)		
-
-print vTemplates
+						et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+						for v in vToApplyVT:
+							v.ViewTemplateId = et[0]
+print vTIds
+print vToApplyVT
 
 
 # Commit transaction
