@@ -31,7 +31,7 @@ selProject = forms.select_open_docs(title="Select project/s to transfer View Tem
 viewsFilter = ElementCategoryFilter(BuiltInCategory.OST_Views)
 
 # Function to retrieve View Templates
-def retrieveVT(docList):
+def retrieveVT(docList, currentDoc):
 	storeDict = {}
 	if isinstance(docList, list):
 		for pro in docList:
@@ -39,6 +39,11 @@ def retrieveVT(docList):
 			for view in viewsCollector:
 				if view.IsTemplate == True:
 					storeDict[view.Name + " - " + pro.Title] = view
+	elif currentDoc == True:
+		viewsCollector = FilteredElementCollector(docList).WherePasses(viewsFilter)
+		for view in viewsCollector:
+			if view.IsTemplate == True:
+				storeDict[view.Name] = view
 	else:
 		viewsCollector = FilteredElementCollector(docList).WherePasses(viewsFilter)
 		for view in viewsCollector:
@@ -47,25 +52,49 @@ def retrieveVT(docList):
 	return storeDict
 
 # Retrieve all view templates from selected docs
-viewTemplates = retrieveVT(selProject)
+viewTemplates = retrieveVT(selProject, False)
 
 # Display select view templates form
 vTemplates = forms.SelectFromList.show(viewTemplates.keys(), "View Templates", 600, 300, multiselect=True)
 
 # Collect all View Templates in the current document
-docTemplates = retrieveVT(doc)
+docTemplates = retrieveVT(doc, True)
+
+# Remove view templates with same name
+vTemplatesNoProj = []
+for vT in vTemplates:
+	for p in selProject:
+		if p.Title in vT:
+			vTemplatesNoProj.append(vT.replace(p.Title, ""))
+
+# Remove duplicated view templates from selection
+newVTemplates = []
+uniqueTemplates = []
+for vNoProj, vT in zip(vTemplatesNoProj, vTemplates):
+	if vNoProj not in uniqueTemplates:
+		uniqueTemplates.append(vNoProj)
+		newVTemplates.append(vT)
+
+vTemplates = newVTemplates
 
 # Collect all views from the current document
 docViewsCollector = FilteredElementCollector(doc).WherePasses(viewsFilter)
 
-# Check for all views that has a view template
-for v in docViewsCollector:
-	if v.ViewTemplateId != ElementId.InvalidElementId:
-		print v.ViewTemplateId
-
 # Check for duplicate View Templates in the current project
-# TODO
+dupViewTemplates = []
+for vN, vT in docTemplates.items():
+	for v in vTemplates:
+		if vN in v:
+			dupViewTemplates.append(vT)
 
+# Check for all views that has a view template
+for vT in vTemplates:
+	for v in docViewsCollector:
+		if v.ViewTemplateId != ElementId.InvalidElementId:
+			print v.Name
+
+
+"""
 # Transform object
 transIdent = Transform.Identity
 copyPasteOpt = CopyPasteOptions()
@@ -95,3 +124,4 @@ def printMessage(resultList, message):
 # Print message
 printMessage([], "The following View Templates were transferred:")
 printMessage([], "Non transferred View Templates:")
+"""
