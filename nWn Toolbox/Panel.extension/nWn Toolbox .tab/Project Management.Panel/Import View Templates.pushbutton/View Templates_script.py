@@ -87,14 +87,14 @@ for vN, vT in docTemplates.items():
 		if vN in v:
 			dupViewTemplates.append(vT)
 
-# Check for all views that has a view template
-for vT in vTemplates:
-	for v in docViewsCollector:
+# Views with view templates
+def checkViewT(viewsList):
+	viewsWVT = []
+	for v in viewsList:
 		if v.ViewTemplateId != ElementId.InvalidElementId:
-			print v.Name
+			viewsWVT.append(v)
+	return viewsWVT
 
-
-"""
 # Transform object
 transIdent = Transform.Identity
 copyPasteOpt = CopyPasteOptions()
@@ -102,6 +102,36 @@ copyPasteOpt = CopyPasteOptions()
 # Create single transaction and start it
 t = Transaction(doc, "Copy View Templates")
 t.Start()
+
+# Check for all views that has a view template
+for vT in vTemplates:
+	vTId = List[ElementId]()
+	for pro in selProject:
+		if pro.Title in vT:
+			vTId.Add(viewTemplates[vT].Id)
+			# Check if view template is used in current doc
+			if vT.replace(" - " + pro.Title, "") not in docTemplates.keys():
+				# Copy the selected View Template to current project
+				# et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+			else:
+				viewsWVT = checkViewT(docViewsCollector)
+				vToApplyVT = []
+				vTIds = []
+				for v in viewsWVT:
+					if v.Name in vT and v.ViewTemplateId not in vTIds:
+						vTIds.append(v.ViewTemplateId)
+						vToApplyVT.append(v)
+						doc.Delete(v.ViewTemplateId)
+						# et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)		
+
+print vTemplates
+
+
+# Commit transaction
+t.Commit()
+
+"""
+
 
 # Retrieve View Templates to transfer
 for vT in vTemplates:
@@ -112,8 +142,6 @@ for vT in vTemplates:
 			# Copy the selected View Template to current project
 			et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 
-# Commit transaction
-t.Commit()
 
 # Function to display result to user
 def printMessage(resultList, message):
