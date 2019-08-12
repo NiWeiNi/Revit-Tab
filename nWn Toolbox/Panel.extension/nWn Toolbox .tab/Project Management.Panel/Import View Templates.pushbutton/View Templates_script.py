@@ -89,11 +89,14 @@ for vN, vT in docTemplates.items():
 
 # Views with view templates
 def checkViewT(viewsList):
-	viewsWVT = []
+	viewsWVT = {}
 	for v in viewsList:
 		if v.ViewTemplateId != ElementId.InvalidElementId:
-			viewsWVT.append(v)
+			viewsWVT.setdefault(v.ViewTemplateId.ToString(), []).append(v)
 	return viewsWVT
+
+# Return all view with view templates in a dictionary
+viewTemp = checkViewT(docViewsCollector)
 
 # Transform object
 transIdent = Transform.Identity
@@ -127,9 +130,6 @@ for vT in vTemplates:
 						et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 						for v in vToApplyVT:
 							v.ViewTemplateId = et[0]
-print vTIds
-print vToApplyVT
-
 
 # Commit transaction
 t.Commit()
