@@ -106,6 +106,8 @@ t.Start()
 # Check for all views that has a view template
 vTIds = []
 viewsWVT = checkViewT(docViewsCollector)
+viewsFail = []
+viewsSuccess = []
 for vT in vTemplates:
 	vTId = List[ElementId]()
 	for pro in selProject:
@@ -129,32 +131,25 @@ for vT in vTemplates:
 								et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 							else:
 								break
-						v.ViewTemplateId = et[0]
-						flag = False
+						try:
+							v.ViewTemplateId = et[0]
+							viewsSuccess.append(v.Name)
+							flag = False
+						except:
+							viewsFail.append(v.Name)
 
 # Commit transaction
 t.Commit()
 
-"""
-
-
-# Retrieve View Templates to transfer
-for vT in vTemplates:
-	vTId = List[ElementId]()
-	for pro in selProject:
-		if pro.Title in vT:
-			vTId.Add(viewTemplates[vT].Id)
-			# Copy the selected View Template to current project
-			et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
-
-
 # Function to display result to user
-def printMessage(resultList, message):
+def printMessage(resultList, failedList, message, messageWarning):
 	if len(resultList) != 0:
 		print(message)
 		print("\n".join(resultList))
+	if len(failedList) != 0:
+		print(messageWarning)
+		print("\n".join(resultList))
 
 # Print message
-printMessage([], "The following View Templates were transferred:")
-printMessage([], "Non transferred View Templates:")
-"""
+printMessage(viewsSuccess, viewsFail, "The following view's view template have been changed:",
+			"View templates failed to apply to views, make sure the proper view template type is named:")
