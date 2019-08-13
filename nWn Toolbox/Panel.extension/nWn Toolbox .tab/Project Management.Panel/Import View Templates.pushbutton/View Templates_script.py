@@ -95,9 +95,6 @@ def checkViewT(viewsList):
 			viewsWVT.setdefault(v.ViewTemplateId.ToString(), []).append(v)
 	return viewsWVT
 
-# Return all view with view templates in a dictionary
-viewTemp = checkViewT(docViewsCollector)
-
 # Transform object
 transIdent = Transform.Identity
 copyPasteOpt = CopyPasteOptions()
@@ -117,19 +114,23 @@ for vT in vTemplates:
 			# Check if view template is used in current doc
 			if vT.replace(" - " + pro.Title, "") not in docTemplates.keys():
 				# Copy the selected View Template to current project
-				# et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
-				print vT.replace(" - " + pro.Title, "") not in docTemplates.keys()
+				ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+				continue
 			else:
 				vToApplyVT = []
-				for v in viewsWVT:
-					el = doc.GetElement(v.ViewTemplateId)
-					if el.Name in vT and v.ViewTemplateId not in vTIds:
-						vTIds.append(v.ViewTemplateId)
-						vToApplyVT.append(v)
-						doc.Delete(v.ViewTemplateId)
-						et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
-						for v in vToApplyVT:
-							v.ViewTemplateId = et[0]
+				for k in viewsWVT.keys():
+					views = viewsWVT[k]
+					flag = True
+					for v in views:
+						if flag:
+							elName = doc.GetElement(v.ViewTemplateId).Name
+							if elName in vT:
+								doc.Delete(v.ViewTemplateId)
+								et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+							else:
+								break
+						v.ViewTemplateId = et[0]
+						flag = False
 
 # Commit transaction
 t.Commit()
