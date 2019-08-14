@@ -115,15 +115,19 @@ for vT in vTemplates:
 			vTId.Add(viewTemplates[vT].Id)
 			# Check if view template is used in current doc
 			if vT.replace(" - " + pro.Title, "") not in docTemplates.keys():
-				# Copy the selected View Template to current project
+				# If not, copy the selected View Template to current project
 				ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
-				continue
+			# View templates are already in use in the current project
 			else:
 				vToApplyVT = []
+				# Loop through each view template in use in the current document
 				for k in viewsWVT.keys():
 					views = viewsWVT[k]
+					# Helper variable to mark the first time to run the script
 					flag = True
+					# Assign new view template to each view
 					for v in views:
+						# Retrieve view template for first time use
 						if flag:
 							elName = doc.GetElement(v.ViewTemplateId).Name
 							if elName in vT:
@@ -131,12 +135,14 @@ for vT in vTemplates:
 								et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 							else:
 								break
+						# Assign view template
 						try:
 							v.ViewTemplateId = et[0]
 							viewsSuccess.append(v.Name)
 							flag = False
 						except:
 							viewsFail.append(v.Name)
+							flag = False
 
 # Commit transaction
 t.Commit()
