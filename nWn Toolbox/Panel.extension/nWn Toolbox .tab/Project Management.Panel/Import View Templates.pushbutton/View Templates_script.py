@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Import View Templates.
 
-NOTE: Only new View Templates are transferred. Same name VT won't be overriden
+NOTE: No schedule view template will be transferred. Same name view templates will be overriden and views will be updated.
 """
 __title__ = 'Import View\nTemplates'
 __author__ = "nWn"
