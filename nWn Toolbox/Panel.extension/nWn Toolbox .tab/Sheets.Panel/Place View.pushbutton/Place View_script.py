@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Fills in empty Drawn by and Checked by parameters with custom input.
+"""Place current active view in selected sheet.
 
 NOTE: 
-Already filled in parameters will not be overridden."""
+Position will be center."""
 __title__ = 'Fill in\nDrawn'
 __author__ = "nWn"
 
