@@ -3,11 +3,14 @@
 
 NOTE: 
 Position will be center."""
-__title__ = 'Fill in\nDrawn'
+__title__ = 'Current View\non Sheet'
 __author__ = "nWn"
 
 # Import commom language runtime
 import clr
+
+# Import forms from pyrevit
+from pyrevit import forms
 
 # Import Revit DB
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, \
@@ -22,6 +25,11 @@ uidoc = __revit__.ActiveUIDocument
 sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets) \
                                                 .ToElements()
 
+# Retrieve current view
+curView = doc.ActiveView
+
+
+"""
 # Create a Transaction group to group all subsequent transactions
 tg = TransactionGroup(doc, "Update Drawn By and Checked By")
 
@@ -65,3 +73,4 @@ tg.Assimilate()
 
 # Print all changed sheets
 print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
+"""
