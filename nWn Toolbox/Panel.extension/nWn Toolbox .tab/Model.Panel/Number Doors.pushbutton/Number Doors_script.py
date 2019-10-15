@@ -21,9 +21,10 @@ doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).Where
 phases = doc.Phases
 phasesName = [ph.Name for ph in phases]
 
-# Class 
-
 # Form to select phase
 phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
 
-print phaseForm
+# Retrieve selected phase
+for ph in phases:
+    if ph.Name == phaseForm:
+        selectedPhase = ph
