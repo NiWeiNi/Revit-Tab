@@ -34,3 +34,28 @@ toRooms = []
 for d in doorsCollector:
     room = d.ToRoom[selectedPhase]
     toRooms.append(room)
+
+# Set auxiliar variables
+roomNumbers = [x.Number if x != None else "" for x in toRooms]
+countNumbers = {}
+finalList = []
+department = []
+
+# Loop through all  rooms
+for r in toRooms:
+    # Check room is not null
+	if r != None:
+        # Check room is not duplicated
+		if r.Number not in countNumbers.keys():
+			finalList.append(r.Number)
+			countNumbers[r.Number] = 1
+        # If room is duplicated, count the number
+		else:
+			countNumbers[r.Number] = countNumbers[r.Number] + 1
+			if countNumbers[r.Number] == 2:
+				finalList[finalList.index(r.Number)] = r.Number + "A"
+				finalList.append(r.Number + "B")
+			else:
+				finalList.append(r.Number + chr(ord('@')+countNumbers[r.Number]))
+	else:
+		finalList.append("")
