@@ -28,3 +28,9 @@ phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
 for ph in phases:
     if ph.Name == phaseForm:
         selectedPhase = ph
+
+# Check doors ToRoom
+toRooms = []
+for d in doorsCollector:
+    room = d.ToRoom[selectedPhase]
+    toRooms.append(room)
