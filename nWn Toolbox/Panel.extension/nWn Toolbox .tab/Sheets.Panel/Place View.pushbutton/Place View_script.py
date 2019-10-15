@@ -9,7 +9,7 @@ __author__ = "nWn"
 # Import commom language runtime
 import clr
 
-# Import forms from pyRevit
+# Import forms from pyrevit
 from pyrevit import forms
 
 # Import Revit DB
@@ -27,7 +27,6 @@ sheetsCollector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_S
 
 # Retrieve current view
 curView = doc.ActiveView
-
 
 
 """
