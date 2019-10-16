@@ -5,17 +5,25 @@ __author__ = "nWn"
 __title__ = "Number\n Doors"
 
 # Import 
-from pyrevit import revit, DB
+from pyrevit import revit, DB, UI
 from pyrevit import script
 from pyrevit import forms
-
-# Set the condition to run the script: Doors must have Department parameter
-#TODO
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Set the condition to run the script: Doors must have Department parameter
+params = doc.ParameterBindings.ForwardIterator()
+while params.MoveNext():
+	for cat in params.Current.Categories:
+		if cat.Name == "Doors" and params.Key.Name == "Department":
+			#TODO
+			continue
+		else:
+			forms.alert("Please create a Project Parameter for Doors called Department", ok = True, exitscript= True)
+
+"""
 # Select all doors
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
 doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
@@ -77,3 +85,4 @@ for d, n, dep in zip(doorsCollector, finalList, department):
 
 # Commit transaction
 t.Commit()
+"""
