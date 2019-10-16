@@ -9,6 +9,8 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
+import System.Collections.Generic.IEnumerable as IEnumerable
+
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
@@ -76,7 +78,8 @@ def numberDoors():
 				# Set numbers to doors
 				for d, n, dep in zip(doorsCollector, finalList, department):
 					d.LookupParameter("Mark").Set(n)
-					# d.LookupParameter("Department").Set(dep)
+					# Use overloads with a string as IronPython will throw an error by using same string
+					d.LookupParameter("Department").Set.Overloads[str](dep)
 
 				# Commit transaction
 				t.Commit()
