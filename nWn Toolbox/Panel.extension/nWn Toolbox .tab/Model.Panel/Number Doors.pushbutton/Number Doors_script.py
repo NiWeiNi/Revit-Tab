@@ -63,11 +63,13 @@ def numberDoors():
 						# If room is duplicated, count the number
 						else:
 							countNumbers[r.Number] = countNumbers[r.Number] + 1
+							# Check if there is more than one instance of door in the room and name them accordngly
 							if countNumbers[r.Number] == 2:
 								finalList[finalList.index(r.Number)] = r.Number + "A"
 								finalList.append(r.Number + "B")
 							else:
 								finalList.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
+					# Case room is null leave Mark as it is and delete department
 					else:
 						finalList.append(d.LookupParameter("Mark").AsString())
 						department.append("")
