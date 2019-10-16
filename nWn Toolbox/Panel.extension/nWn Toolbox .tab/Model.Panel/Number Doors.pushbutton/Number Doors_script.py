@@ -59,3 +59,15 @@ for r in toRooms:
 				finalList.append(r.Number + chr(ord('@')+countNumbers[r.Number]))
 	else:
 		finalList.append("")
+
+# Create a individual transaction to change the parameters
+t = DB.Transaction(doc, "Set Mark on Doors")
+# Start individual transaction
+t.Start()
+
+# Set numbers to doors
+for d, n in zip(doorsCollector, finalList):
+    d.LookupParameter("Mark").Set(n)
+
+# Commit transaction
+t.Commit()
