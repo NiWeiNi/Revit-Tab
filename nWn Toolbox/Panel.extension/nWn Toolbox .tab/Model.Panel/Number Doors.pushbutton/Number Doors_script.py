@@ -60,7 +60,7 @@ for r, d in zip(toRooms, doorsCollector):
 				finalList[finalList.index(r.Number)] = r.Number + "A"
 				finalList.append(r.Number + "B")
 			else:
-				finalList.append(r.Number + chr(ord('@')+countNumbers[r.Number]))
+				finalList.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
 	else:
 		finalList.append(d.LookupParameter("Mark").AsString())
 		department.append("")
