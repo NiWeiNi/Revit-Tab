@@ -48,7 +48,7 @@ def numberDoors():
 
 				# Set auxiliar variables
 				countNumbers = {}
-				finalList = []
+				doorNumbers = []
 				department = []
 
 				# Loop through all  rooms
@@ -58,20 +58,20 @@ def numberDoors():
 						department.append(r.LookupParameter("Department").AsString())
 						# Check room is not duplicated
 						if r.Number not in countNumbers.keys():
-							finalList.append(r.Number)
+							doorNumbers.append(r.Number)
 							countNumbers[r.Number] = 1
 						# If room is duplicated, count the number
 						else:
 							countNumbers[r.Number] = countNumbers[r.Number] + 1
 							# Check if there is more than one instance of door in the room and name them accordngly
 							if countNumbers[r.Number] == 2:
-								finalList[finalList.index(r.Number)] = r.Number + "A"
-								finalList.append(r.Number + "B")
+								doorNumbers[doorNumbers.index(r.Number)] = r.Number + "A"
+								doorNumbers.append(r.Number + "B")
 							else:
-								finalList.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
+								doorNumbers.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
 					# Case room is null leave Mark as it is and delete department
 					else:
-						finalList.append(d.LookupParameter("Mark").AsString())
+						doorNumbers.append(d.LookupParameter("Mark").AsString())
 						department.append("")
 
 				# Create a individual transaction to change the parameters
@@ -80,7 +80,7 @@ def numberDoors():
 				t.Start()
 
 				# Set Mark and Department in doors
-				for d, n, dep in zip(doorsCollector, finalList, department):
+				for d, n, dep in zip(doorsCollector, doorNumbers, department):
 					d.LookupParameter("Mark").Set(n)
 					# Use overloads with a string as IronPython will throw an error by using same string
 					d.LookupParameter("Department").Set.Overloads[str](dep)
