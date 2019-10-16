@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Number doors according to room number.
+"""Number doors according to room number and assign department.
 """
 __author__ = "nWn"
 __title__ = "Number\n Doors"
@@ -8,8 +8,6 @@ __title__ = "Number\n Doors"
 from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
-
-import System.Collections.Generic.IEnumerable as IEnumerable
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -44,7 +42,6 @@ def numberDoors():
 					toRooms.append(room)
 
 				# Set auxiliar variables
-				roomNumbers = [x.Number if x != None else "" for x in toRooms]
 				countNumbers = {}
 				finalList = []
 				department = []
@@ -75,7 +72,7 @@ def numberDoors():
 				# Start individual transaction
 				t.Start()
 
-				# Set numbers to doors
+				# Set Mark and Department in doors
 				for d, n, dep in zip(doorsCollector, finalList, department):
 					d.LookupParameter("Mark").Set(n)
 					# Use overloads with a string as IronPython will throw an error by using same string
@@ -84,6 +81,7 @@ def numberDoors():
 				# Commit transaction
 				t.Commit()
 				
+				# End function
 				return True
 
 	# Finish script if there is no required project parameter 
