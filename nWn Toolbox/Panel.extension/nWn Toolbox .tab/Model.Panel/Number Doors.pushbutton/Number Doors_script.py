@@ -9,6 +9,9 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
+# Set the condition to run the script: Doors must have Department parameter
+#TODO
+
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
@@ -26,14 +29,14 @@ phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
 
 # Retrieve selected phase
 for ph in phases:
-    if ph.Name == phaseForm:
-        selectedPhase = ph
+	if ph.Name == phaseForm:
+		selectedPhase = ph
 
 # Check doors ToRoom
 toRooms = []
 for d in doorsCollector:
-    room = d.ToRoom[selectedPhase]
-    toRooms.append(room)
+	room = d.ToRoom[selectedPhase]
+	toRooms.append(room)
 
 # Set auxiliar variables
 roomNumbers = [x.Number if x != None else "" for x in toRooms]
@@ -42,14 +45,15 @@ finalList = []
 department = []
 
 # Loop through all  rooms
-for r in toRooms:
-    # Check room is not null
+for r, d in zip(toRooms, doorsCollector):
+	# Check room is not null
 	if r != None:
-        # Check room is not duplicated
+		department.append(r.LookupParameter("Department").AsString())
+		# Check room is not duplicated
 		if r.Number not in countNumbers.keys():
 			finalList.append(r.Number)
 			countNumbers[r.Number] = 1
-        # If room is duplicated, count the number
+		# If room is duplicated, count the number
 		else:
 			countNumbers[r.Number] = countNumbers[r.Number] + 1
 			if countNumbers[r.Number] == 2:
@@ -58,7 +62,8 @@ for r in toRooms:
 			else:
 				finalList.append(r.Number + chr(ord('@')+countNumbers[r.Number]))
 	else:
-		finalList.append("")
+		finalList.append(d.LookupParameter("Mark").AsString())
+		department.append("")
 
 # Create a individual transaction to change the parameters
 t = DB.Transaction(doc, "Set Mark on Doors")
@@ -66,8 +71,9 @@ t = DB.Transaction(doc, "Set Mark on Doors")
 t.Start()
 
 # Set numbers to doors
-for d, n in zip(doorsCollector, finalList):
-    d.LookupParameter("Mark").Set(n)
+for d, n, dep in zip(doorsCollector, finalList, department):
+	d.LookupParameter("Mark").Set(n)
+	d.LookupParameter("Department").Set(dep)
 
 # Commit transaction
 t.Commit()
