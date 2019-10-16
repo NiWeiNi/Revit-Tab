@@ -36,10 +36,15 @@ def numberDoors():
 						selectedPhase = ph
 
 				# Check doors ToRoom
-				toRooms = []
+				rooms = []
 				for d in doorsCollector:
-					room = d.ToRoom[selectedPhase]
-					toRooms.append(room)
+					# Pick preferred ToRoom parameter as default room
+					if d.ToRoom != None:
+						room = d.ToRoom[selectedPhase]
+					# Default to FromRoom
+					else:
+						room = d.FromRoom[selectedPhase]
+					rooms.append(room)
 
 				# Set auxiliar variables
 				countNumbers = {}
@@ -47,7 +52,7 @@ def numberDoors():
 				department = []
 
 				# Loop through all  rooms
-				for r, d in zip(toRooms, doorsCollector):
+				for r, d in zip(rooms, doorsCollector):
 					# Check room is not null
 					if r != None:
 						department.append(r.LookupParameter("Department").AsString())
