@@ -75,7 +75,7 @@ def numberDoors():
 								doorNumbers.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
 					# Case room is null leave Mark as it is and delete department
 					else:
-						doorNumbers.append(d.LookupParameter("Mark").AsString())
+						doorNumbers.append("")
 						department.append("")
 						roomName.append("")
 						roomNumber.append("")
