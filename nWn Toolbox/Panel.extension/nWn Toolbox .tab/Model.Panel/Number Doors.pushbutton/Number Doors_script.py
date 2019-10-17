@@ -87,8 +87,8 @@ def numberDoors():
 
 				# Set Mark and Department in doors
 				for d, n, dep, numb, nam in zip(doorsCollector, doorNumbers, department, roomNumber, roomName):
-					d.LookupParameter("Mark").Set(n)
 					# Use overloads with a string as IronPython will throw an error by using same string
+					d.LookupParameter("Mark").Set.Overloads[str](n)
 					d.LookupParameter("Department").Set.Overloads[str](dep)
 					d.LookupParameter("Room Number").Set.Overloads[str](numb)
 					d.LookupParameter("Room Name").Set.Overloads[str](nam)
