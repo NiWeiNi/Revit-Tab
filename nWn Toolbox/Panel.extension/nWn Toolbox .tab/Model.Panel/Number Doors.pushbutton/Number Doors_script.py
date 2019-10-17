@@ -50,12 +50,16 @@ def numberDoors():
 				countNumbers = {}
 				doorNumbers = []
 				department = []
+				roomName = []
+				roomNumber = []
 
 				# Loop through all  rooms
 				for r, d in zip(rooms, doorsCollector):
 					# Check room is not null
 					if r != None:
 						department.append(r.LookupParameter("Department").AsString())
+						roomName.append(r.LookupParameter("Name").AsString())
+						roomNumber.append(r.LookupParameter("Number").AsString())
 						# Check room is not duplicated
 						if r.Number not in countNumbers.keys():
 							doorNumbers.append(r.Number)
@@ -73,6 +77,8 @@ def numberDoors():
 					else:
 						doorNumbers.append(d.LookupParameter("Mark").AsString())
 						department.append("")
+						roomName.append("")
+						roomNumber.append("")
 
 				# Create a individual transaction to change the parameters
 				t = DB.Transaction(doc, "Set Mark on Doors")
@@ -80,10 +86,12 @@ def numberDoors():
 				t.Start()
 
 				# Set Mark and Department in doors
-				for d, n, dep in zip(doorsCollector, doorNumbers, department):
+				for d, n, dep, numb, nam in zip(doorsCollector, doorNumbers, department, roomNumber, roomName):
 					d.LookupParameter("Mark").Set(n)
 					# Use overloads with a string as IronPython will throw an error by using same string
 					d.LookupParameter("Department").Set.Overloads[str](dep)
+					d.LookupParameter("Room Number").Set(numb)
+					d.LookupParameter("Room Name").Set(nam)
 
 				# Commit transaction
 				t.Commit()
