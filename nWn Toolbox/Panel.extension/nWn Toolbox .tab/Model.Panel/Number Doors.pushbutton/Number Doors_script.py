@@ -90,8 +90,8 @@ def numberDoors():
 					d.LookupParameter("Mark").Set(n)
 					# Use overloads with a string as IronPython will throw an error by using same string
 					d.LookupParameter("Department").Set.Overloads[str](dep)
-					d.LookupParameter("Room Number").Set(numb)
-					d.LookupParameter("Room Name").Set(nam)
+					d.LookupParameter("Room Number").Set.Overloads[str](numb)
+					d.LookupParameter("Room Name").Set.Overloads[str](nam)
 
 				# Commit transaction
 				t.Commit()
