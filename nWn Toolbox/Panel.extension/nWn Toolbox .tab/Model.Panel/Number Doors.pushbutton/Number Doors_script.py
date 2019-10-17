@@ -39,7 +39,7 @@ def numberDoors():
 				rooms = []
 				for d in doorsCollector:
 					# Pick preferred ToRoom parameter as default room
-					if d.ToRoom != None:
+					if d.ToRoom[selectedPhase] != None:
 						room = d.ToRoom[selectedPhase]
 					# Default to FromRoom
 					else:
