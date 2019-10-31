@@ -20,12 +20,14 @@ selectionIds = selection.GetElementIds()
 # Check if Selection is empty
 count = selectionIds.Count 
 if count == 0:
-	print "No element selected"
+	print("No element selected")
 # Print selected elements
 else:
-	for id in selectionIds:
+	print("There are " + str(count) + " elements in selection:")
+	# List all elements in order
+	for id, n in zip(selectionIds, range(count)):
 		try:
 			e = doc.GetElement(id)
-			print e.Name
+			print(str(n) + ": " + e.Name)
 		except:
-			print ""
+			print(str(n) + ": ")
