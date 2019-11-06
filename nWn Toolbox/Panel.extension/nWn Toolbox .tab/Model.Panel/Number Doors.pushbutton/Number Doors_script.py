@@ -20,6 +20,12 @@ def insideGroup(element, groups):
 			if id == element.Id:
 				return True
 
+# Function to ungroup current group and store groups name and elements
+def ungroup(group):
+	gEIds = group.GetMemberIds()
+	group.UngroupMembers()
+	return gEIds
+
 def numberDoors():
 	# Set the condition to run the script: Doors must have Department parameter
 	params = doc.ParameterBindings.ForwardIterator()
