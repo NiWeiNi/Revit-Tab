@@ -123,5 +123,8 @@ def numberDoors():
 # Collect all groups
 groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
 
+# Collect all group types
+gTypesCollector = DB.FilteredElementCollector(doc).OfClass(DB.GroupType)
+
 # Call function to number doors
 # numberDoors()
