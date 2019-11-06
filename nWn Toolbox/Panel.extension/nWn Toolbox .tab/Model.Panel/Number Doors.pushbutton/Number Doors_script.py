@@ -126,5 +126,9 @@ groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
 # Collect all group types
 gTypesCollector = DB.FilteredElementCollector(doc).OfClass(DB.GroupType)
 
+# Select all doors
+doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
+doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
+
 # Call function to number doors
 # numberDoors()
