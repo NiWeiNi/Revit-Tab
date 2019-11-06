@@ -30,6 +30,7 @@ def ungroup(group):
 def swapGroup(group, groupType):
 	group.GroupType = groupType
 
+# Function to number doors
 def numberDoors():
 	# Set the condition to run the script: Doors must have Department parameter
 	params = doc.ParameterBindings.ForwardIterator()
