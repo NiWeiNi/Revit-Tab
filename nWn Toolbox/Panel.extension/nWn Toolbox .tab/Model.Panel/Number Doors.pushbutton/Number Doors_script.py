@@ -13,6 +13,13 @@ from pyrevit import forms
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Function to check if element is in group
+def insideGroup(element, groups):
+	for g in groups:
+		for id in g.GetMemberIds():
+			if id == element.Id:
+				return True
+
 def numberDoors():
 	# Set the condition to run the script: Doors must have Department parameter
 	params = doc.ParameterBindings.ForwardIterator()
@@ -102,5 +109,8 @@ def numberDoors():
 	# Finish script if there is no required project parameter 
 	forms.alert("Please create a Project Parameter for Doors called Department", ok = True, exitscript= True)
 
+# Collect all groups
+groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
+
 # Call function to number doors
-numberDoors()
+# numberDoors()
