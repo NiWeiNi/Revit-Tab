@@ -8,6 +8,7 @@ __title__ = "Number\n Doors"
 from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
+import copy
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -37,9 +38,6 @@ def numberDoors():
 	while params.MoveNext():
 		for cat in params.Current.Categories:
 			if cat.Name == "Doors" and params.Key.Name == "Department":
-				# Select all doors
-				doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
-				doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
 
 				# Select all phases
 				phases = doc.Phases
@@ -130,5 +128,19 @@ gTypesCollector = DB.FilteredElementCollector(doc).OfClass(DB.GroupType)
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
 doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
 
+# Variables to store critical data
+gTypeIds = [x.GroupType.Id for x in groupsCollector]
+gElemIds = [x.GetMemberIds() for x in groupsCollector]
+
+# Ungroups the groups
+# Create a individual transaction to change the parameters
+t = DB.Transaction(doc, "Ungroup Groups")
+# Start individual transaction
+t.Start()
+for g in groupsCollector:
+	g.UngroupMembers()
+# Commit transaction
+t.Commit()
+
 # Call function to number doors
-# numberDoors()
+numberDoors()
