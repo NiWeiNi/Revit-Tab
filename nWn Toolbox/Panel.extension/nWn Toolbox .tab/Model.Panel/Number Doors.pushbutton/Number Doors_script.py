@@ -73,15 +73,15 @@ def numberDoors():
 								doorNumbers.append(r.Number + "B")
 							else:
 								doorNumbers.append(r.Number + chr(ord('@') + countNumbers[r.Number]))
-					# Case room is null leave Mark as it is and delete department
+					# Case room is null leave Door Number as it is and delete department
 					else:
-						doorNumbers.append(d.LookupParameter("Mark").AsString())
+						doorNumbers.append(d.LookupParameter("Door Number").AsString())
 						department.append("")
 						roomName.append("")
 						roomNumber.append("")
 
 				# Create a individual transaction to change the parameters
-				t = DB.Transaction(doc, "Set Mark on Doors")
+				t = DB.Transaction(doc, "Set Door Number on Doors")
 				# Start individual transaction
 				t.Start()
 
