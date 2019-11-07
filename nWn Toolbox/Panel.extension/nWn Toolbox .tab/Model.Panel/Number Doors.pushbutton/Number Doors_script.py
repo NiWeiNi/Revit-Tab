@@ -31,6 +31,11 @@ def ungroup(group):
 def swapGroup(group, groupType):
 	group.GroupType = groupType
 
+# Function to make groups
+def createGroup(elIds):
+	group = doc.Create.NewGroup(elIds)
+	return group
+
 # Function to number doors
 def numberDoors():
 	# Set the condition to run the script: Doors must have Department parameter
@@ -116,7 +121,7 @@ def numberDoors():
 				return True
 
 	# Finish script if there is no required project parameter 
-	forms.alert("Please create a Project Parameter for Doors called Department", ok = True, exitscript= True)
+	forms.alert("Please create Project Parameter for Doors called Department, Room Number and Room Name", ok = True, exitscript= True)
 
 # Collect all groups
 groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
@@ -144,3 +149,13 @@ t.Commit()
 
 # Call function to number doors
 numberDoors()
+
+# Create groups and swap to original ones
+for g, gt in zip(gElemIds, gTypeIds):
+	t = DB.Transaction(doc, "Create and Swap Groups")
+	# Start individual transaction
+	t.Start()
+	ng = createGroup(g)
+	swapGroup(ng, doc.GetElement(gt))
+	# Commit transaction
+	t.Commit()
