@@ -36,6 +36,13 @@ def createGroup(elIds):
 	group = doc.Create.NewGroup(elIds)
 	return group
 
+# Function to check category
+def checkCat(membersId):
+	for m in membersId:
+		el = doc.GetElement(m).Category.Name
+		if el == "Doors":
+			return True
+
 # Function to number doors
 def numberDoors():
 	# Set the condition to run the script: Doors must have Department parameter
@@ -109,7 +116,7 @@ def numberDoors():
 				# Set Mark and Department in doors
 				for d, n, dep, numb, nam in zip(doorsCollector, doorNumbers, department, roomNumber, roomName):
 					# Use overloads with a string as IronPython will throw an error by using same string
-					d.LookupParameter("Mark").Set.Overloads[str](n)
+					d.LookupParameter("Door Number").Set.Overloads[str](n)
 					d.LookupParameter("Department").Set.Overloads[str](dep)
 					d.LookupParameter("Room Number").Set.Overloads[str](numb)
 					d.LookupParameter("Room Name").Set.Overloads[str](nam)
@@ -121,41 +128,52 @@ def numberDoors():
 				return True
 
 	# Finish script if there is no required project parameter 
-	forms.alert("Please create Project Parameter for Doors called Department, Room Number and Room Name", ok = True, exitscript= True)
+	forms.alert("Please create Project Parameter for Doors called Door Number, Department, Room Number and Room Name", ok = True, exitscript= True)
 
 # Collect all groups
 groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
 
-# Collect all group types
-gTypesCollector = DB.FilteredElementCollector(doc).OfClass(DB.GroupType)
+# Filter groups that have doors
+doorGroups = []
+for g in groupsCollector:
+	members = g.GetMemberIds()
+	if checkCat(members):
+		doorGroups.append(g)
+
+print doorGroups
+
+# GroupTypes from doorGroups
+gTypesCollector = [x.GroupType for x in doorGroups]
 
 # Select all doors
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
 doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
 
 # Variables to store critical data
-gTypeIds = [x.GroupType.Id for x in groupsCollector]
-gElemIds = [x.GetMemberIds() for x in groupsCollector]
+gTypeIds = [x.GroupType.Id for x in doorGroups]
+gElemIds = [x.GetMemberIds() for x in doorGroups]
 
+"""
 # Ungroups the groups
 # Create a individual transaction to change the parameters
 t = DB.Transaction(doc, "Ungroup Groups")
 # Start individual transaction
 t.Start()
-for g in groupsCollector:
+for g in doorGroups:
 	g.UngroupMembers()
 # Commit transaction
 t.Commit()
-
+"""
 # Call function to number doors
 numberDoors()
-
+"""
 # Create groups and swap to original ones
 for g, gt in zip(gElemIds, gTypeIds):
 	t = DB.Transaction(doc, "Create and Swap Groups")
 	# Start individual transaction
 	t.Start()
 	ng = createGroup(g)
-	swapGroup(ng, doc.GetElement(gt))
+	# swapGroup(ng, doc.GetElement(gt))
 	# Commit transaction
 	t.Commit()
+"""
