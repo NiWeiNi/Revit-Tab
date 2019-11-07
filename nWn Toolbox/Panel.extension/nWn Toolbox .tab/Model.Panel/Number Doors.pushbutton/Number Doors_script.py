@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Number doors according to room number and assign department.
+
+NOTE: Room name will be assigned according to To Room parameter except rooms named Ensuites or Bathrooms that pick From Room.
 """
 __author__ = "nWn"
 __title__ = "Number\n Doors"
@@ -83,7 +85,8 @@ def numberDoors():
 				# Start individual transaction
 				t.Start()
 
-				# Set Mark and Department in doors
+				# Set Door Number and Department in doors
+				# Door Number is set as instance parameter which value can vary across groups. Default Mark doesn't work properly as it needs to be ungrouped.
 				for d, n, dep, numb, nam in zip(doorsCollector, doorNumbers, department, roomNumber, roomName):
 					# Use overloads with a string as IronPython will throw an error by using same string
 					d.LookupParameter("Door Number").Set.Overloads[str](n)
