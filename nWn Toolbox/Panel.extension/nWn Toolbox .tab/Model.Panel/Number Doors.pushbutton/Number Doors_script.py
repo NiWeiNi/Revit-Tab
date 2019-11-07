@@ -8,40 +8,10 @@ __title__ = "Number\n Doors"
 from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
-import copy
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
-
-# Function to check if element is in group
-def insideGroup(element, groups):
-	for g in groups:
-		for id in g.GetMemberIds():
-			if id == element.Id:
-				return True
-
-# Function to ungroup current group and store groups name and elements
-def ungroup(group):
-	gEIds = group.GetMemberIds()
-	group.UngroupMembers()
-	return gEIds
-
-# Funtion to swap groups
-def swapGroup(group, groupType):
-	group.GroupType = groupType
-
-# Function to make groups
-def createGroup(elIds):
-	group = doc.Create.NewGroup(elIds)
-	return group
-
-# Function to check category
-def checkCat(membersId):
-	for m in membersId:
-		el = doc.GetElement(m).Category.Name
-		if el == "Doors":
-			return True
 
 # Function to number doors
 def numberDoors():
@@ -130,50 +100,9 @@ def numberDoors():
 	# Finish script if there is no required project parameter 
 	forms.alert("Please create Project Parameter for Doors called Door Number, Department, Room Number and Room Name", ok = True, exitscript= True)
 
-# Collect all groups
-groupsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Group)
-
-# Filter groups that have doors
-doorGroups = []
-for g in groupsCollector:
-	members = g.GetMemberIds()
-	if checkCat(members):
-		doorGroups.append(g)
-
-print doorGroups
-
-# GroupTypes from doorGroups
-gTypesCollector = [x.GroupType for x in doorGroups]
-
 # Select all doors
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
 doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
 
-# Variables to store critical data
-gTypeIds = [x.GroupType.Id for x in doorGroups]
-gElemIds = [x.GetMemberIds() for x in doorGroups]
-
-"""
-# Ungroups the groups
-# Create a individual transaction to change the parameters
-t = DB.Transaction(doc, "Ungroup Groups")
-# Start individual transaction
-t.Start()
-for g in doorGroups:
-	g.UngroupMembers()
-# Commit transaction
-t.Commit()
-"""
 # Call function to number doors
 numberDoors()
-"""
-# Create groups and swap to original ones
-for g, gt in zip(gElemIds, gTypeIds):
-	t = DB.Transaction(doc, "Create and Swap Groups")
-	# Start individual transaction
-	t.Start()
-	ng = createGroup(g)
-	# swapGroup(ng, doc.GetElement(gt))
-	# Commit transaction
-	t.Commit()
-"""
