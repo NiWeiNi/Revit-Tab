@@ -46,13 +46,15 @@ def retPhase(phaseName):
 # Function to retrieve door rooms
 def doorRooms(doorsCollector, selectedPhase):
 	rooms = []
+	room = None
 	for d in doorsCollector:
 		toRoom = d.ToRoom[selectedPhase]
 		fromRoom = d.FromRoom[selectedPhase]
 		# Pick preferred ToRoom parameter as default room
 		if toRoom != None:
 			if fromRoom != None:
-				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or "bath" in fromRoom.LookupParameter("Name").AsString().lower()):
+				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or "bath" in fromRoom.LookupParameter("Name").AsString().lower() or
+					"b-ens" in fromRoom.LookupParameter("Name").AsString().lower()):
 					room = fromRoom
 			else:
 				room = toRoom
