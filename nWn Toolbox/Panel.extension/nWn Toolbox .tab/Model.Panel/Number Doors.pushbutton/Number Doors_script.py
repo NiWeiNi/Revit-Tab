@@ -26,6 +26,16 @@ def checkProjParam(catName, paramName):
 	# Finish script if there is no required project parameter 
 	forms.alert("Please create Project Parameter named " + paramName + " under " + catName + " category.", ok = True, exitscript= True)
 
+# Function to select phase
+def selectPhase():
+	# Select all phases
+	phases = doc.Phases
+	phasesName = [ph.Name for ph in phases]
+
+	# Form to select phase
+	phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
+	return phaseForm
+
 # Function to number doors
 def numberDoors():
 
@@ -34,13 +44,6 @@ def numberDoors():
 	checkProjParam("Doors", "Room Number")
 	checkProjParam("Doors", "Room Name")
 	checkProjParam("Doors", "Door Number")
-	
-	# Select all phases
-	phases = doc.Phases
-	phasesName = [ph.Name for ph in phases]
-
-	# Form to select phase
-	phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
 
 	# Retrieve selected phase
 	for ph in phases:
