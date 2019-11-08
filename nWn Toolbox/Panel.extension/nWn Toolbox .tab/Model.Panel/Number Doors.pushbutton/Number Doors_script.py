@@ -43,6 +43,25 @@ def retPhase(phaseName):
 		if ph.Name == phaseName:
 			return ph
 
+# Function to retrieve door rooms
+def doorRooms(doorsCollector, selectedPhase):
+	rooms = []
+	for d in doorsCollector:
+		toRoom = d.ToRoom[selectedPhase]
+		fromRoom = d.FromRoom[selectedPhase]
+		# Pick preferred ToRoom parameter as default room
+		if toRoom != None:
+			if fromRoom != None:
+				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or "bath" in fromRoom.LookupParameter("Name").AsString().lower()):
+					room = fromRoom
+			else:
+				room = toRoom
+		# Default to FromRoom
+		else:
+			room = toRoom
+		rooms.append(room)
+	return rooms
+
 # Function to number doors
 def numberDoors():
 	# Check project parameters
@@ -53,22 +72,12 @@ def numberDoors():
 
 	# Select phase
 	selectedPhase = retPhase(selectPhase())
-	
-	# Check doors ToRoom
-	rooms = []
-	for d in doorsCollector:
-		# Pick preferred ToRoom parameter as default room
-		if d.ToRoom[selectedPhase] != None:
-			room = d.ToRoom[selectedPhase]
-		# Default to FromRoom
-		else:
-			room = d.FromRoom[selectedPhase]
-		rooms.append(room)
 
 	# Set auxiliar variables
 	countNumbers = {}
 	doorNumbers = []
 	department = []
+	rooms = doorRooms(doorsCollector, selectedPhase)
 	roomName = []
 	roomNumber = []
 
@@ -115,7 +124,6 @@ def numberDoors():
 
 	# Commit transaction
 	t.Commit()
-
 
 # Select all doors
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
