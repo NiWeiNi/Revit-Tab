@@ -36,20 +36,24 @@ def selectPhase():
 	phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
 	return phaseForm
 
+# Function to retrieve selected phase
+def retPhase(phaseName):
+	phases = doc.Phases
+	for ph in phases:
+		if ph.Name == phaseName:
+			return ph
+
 # Function to number doors
 def numberDoors():
-
 	# Check project parameters
 	checkProjParam("Doors", "Department")
 	checkProjParam("Doors", "Room Number")
 	checkProjParam("Doors", "Room Name")
 	checkProjParam("Doors", "Door Number")
 
-	# Retrieve selected phase
-	for ph in phases:
-		if ph.Name == phaseForm:
-			selectedPhase = ph
-
+	# Select phase
+	selectedPhase = retPhase(selectPhase())
+	
 	# Check doors ToRoom
 	rooms = []
 	for d in doorsCollector:
