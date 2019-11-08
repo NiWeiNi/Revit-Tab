@@ -53,14 +53,15 @@ def doorRooms(doorsCollector, selectedPhase):
 		# Pick preferred ToRoom parameter as default room
 		if toRoom != None:
 			if fromRoom != None:
-				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or "bath" in fromRoom.LookupParameter("Name").AsString().lower() or
+				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or 
+					"bath" in fromRoom.LookupParameter("Name").AsString().lower() or
 					"b-ens" in fromRoom.LookupParameter("Name").AsString().lower()):
 					room = fromRoom
 			else:
 				room = toRoom
 		# Default to FromRoom
 		else:
-			room = toRoom
+			room = fromRoom
 		rooms.append(room)
 	return rooms
 
