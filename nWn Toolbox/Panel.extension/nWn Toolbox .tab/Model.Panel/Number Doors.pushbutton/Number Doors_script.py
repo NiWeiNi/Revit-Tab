@@ -43,6 +43,16 @@ def retPhase(phaseName):
 		if ph.Name == phaseName:
 			return ph
 
+# Function filter doors in selected phase
+def doorsInPhase(doorsCollector, selectedPhase):
+	doorsInPhase = []
+	for d in doorsCollector:
+		eId = d.get_Parameter(DB.BuiltInParameter.PHASE_CREATED).AsElementId()
+		phase = doc.GetElement(eId)
+		if phase.Name == selectedPhase.Name:
+			doorsInPhase.append(d)
+	return doorsInPhase
+
 # Function to retrieve door rooms
 def doorRooms(doorsCollector, selectedPhase):
 	rooms = []
@@ -102,17 +112,20 @@ def numberDoors():
 	# Select phase
 	selectedPhase = retPhase(selectPhase())
 
+	# Filter doors
+	filteredDoorsInPhase = doorsInPhase(doorsCollector, selectedPhase)
+
 	# Set auxiliar variables
 	countNumbers = {}
 	doorNumbers = []
 	department = []
-	rooms = doorRooms(doorsCollector, selectedPhase)
+	rooms = doorRooms(filteredDoorsInPhase, selectedPhase)
 	sortedLevels = sortLevels()
 	roomName = []
 	roomNumber = []
 
 	# Loop through all  rooms
-	for r, d in zip(rooms, doorsCollector):
+	for r, d in zip(rooms, filteredDoorsInPhase):
 		# Check room is not null
 		if r != None:
 			department.append(r.LookupParameter("Department").AsString())
@@ -145,7 +158,7 @@ def numberDoors():
 
 	# Set Door Number and Department in doors
 	# Door Number is set as instance parameter which value can vary across groups. Default Mark doesn't work properly as it needs to be ungrouped.
-	for d, n, dep, numb, nam, sL in zip(doorsCollector, doorNumbers, department, roomNumber, roomName, sortedLevels):
+	for d, n, dep, numb, nam, sL in zip(filteredDoorsInPhase, doorNumbers, department, roomNumber, roomName, sortedLevels):
 		# Use overloads with a string as IronPython will throw an error by using same string
 		d.LookupParameter("Door Number").Set.Overloads[str](n)
 		d.LookupParameter("Department").Set.Overloads[str](dep)
