@@ -65,6 +65,32 @@ def doorRooms(doorsCollector, selectedPhase):
 		rooms.append(room)
 	return rooms
 
+# Function to fill in sorted levels
+def sortLevels():
+	# Collect all levels
+	levelsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Level)
+	# Retrieve level in livels
+	elevation = [l.LookupParameter("Elevation").AsDouble() for l in levelsCollector]
+	# Create dictionary and order by level
+	levelDict = dict(zip(elevation, levelsCollector))
+	sortedDict = sorted(levelDict.iteritems())
+	# Create dictionary with level name and sorted level name
+	sortedDictLevel = [t[1] for t in sortedDict]
+	levelCount = len(sortedDictLevel)
+	prefix = range(levelCount)
+	levelName = [l.Name for l in sortedDictLevel]
+	sortedLevel = ["{:02} - {}".format(a, b) for a, b in zip(prefix, levelName)]
+	levelNameSorted = dict(zip(levelName, sortedLevel))
+	# Create sorted level name for all doors
+	sortedDoorLevels = []
+	for d in doorsCollector:
+		for levelN in levelName:
+			eId = d.get_Parameter(DB.BuiltInParameter.FAMILY_LEVEL_PARAM).AsElementId()
+			level = doc.GetElement(eId)
+			if level.Name == levelN:
+				sortedDoorLevels.append(levelNameSorted[levelN])
+	return sortedDoorLevels
+
 # Function to number doors
 def numberDoors():
 	# Check project parameters
@@ -81,6 +107,7 @@ def numberDoors():
 	doorNumbers = []
 	department = []
 	rooms = doorRooms(doorsCollector, selectedPhase)
+	sortedLevels = sortLevels()
 	roomName = []
 	roomNumber = []
 
@@ -118,12 +145,13 @@ def numberDoors():
 
 	# Set Door Number and Department in doors
 	# Door Number is set as instance parameter which value can vary across groups. Default Mark doesn't work properly as it needs to be ungrouped.
-	for d, n, dep, numb, nam in zip(doorsCollector, doorNumbers, department, roomNumber, roomName):
+	for d, n, dep, numb, nam, sL in zip(doorsCollector, doorNumbers, department, roomNumber, roomName, sortedLevels):
 		# Use overloads with a string as IronPython will throw an error by using same string
 		d.LookupParameter("Door Number").Set.Overloads[str](n)
 		d.LookupParameter("Department").Set.Overloads[str](dep)
 		d.LookupParameter("Room Number").Set.Overloads[str](numb)
 		d.LookupParameter("Room Name").Set.Overloads[str](nam)
+		d.LookupParameter("Level Sorted").Set.Overloads[str](sL)
 
 	# Commit transaction
 	t.Commit()
