@@ -15,3 +15,12 @@ from pyrevit import forms
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Select all doors
+doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
+doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType().ToElements()
+
+# Create set of Room Name
+roomNames = sorted(list(set([d.LookupParameter("Room Name").AsString() for d in doorsCollector])))
+
+# Create form to select doors by Room Name
+roomNameDoors = forms.SelectFromList.show(roomNames, "View Templates", 600, 300, multiselect=True)
