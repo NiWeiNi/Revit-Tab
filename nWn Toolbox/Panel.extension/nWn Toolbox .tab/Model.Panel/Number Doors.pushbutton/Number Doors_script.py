@@ -76,29 +76,27 @@ def doorRooms(doorsCollector, selectedPhase):
 	return rooms
 
 # Function to fill in sorted levels
-def sortLevels():
+def sortLevels(doorsCollector):
 	# Collect all levels
-	levelsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Level)
-	# Retrieve level in livels
-	elevation = [l.LookupParameter("Elevation").AsDouble() for l in levelsCollector]
-	# Create dictionary and order by level
-	levelDict = dict(zip(elevation, levelsCollector))
-	sortedDict = sorted(levelDict.iteritems())
+	levelsCollector = DB.FilteredElementCollector(doc).OfClass(DB.Level).ToElements()
+	# Sort levels by elevation
+	sortedL = sorted(levelsCollector, key=lambda x: x.LookupParameter("Elevation").AsDouble())
 	# Create dictionary with level name and sorted level name
-	sortedDictLevel = [t[1] for t in sortedDict]
-	levelCount = len(sortedDictLevel)
+	levelCount = len(sortedL)
 	prefix = range(levelCount)
-	levelName = [l.Name for l in sortedDictLevel]
+	levelName = [l.Name for l in sortedL]
 	sortedLevel = ["{:02} - {}".format(a, b) for a, b in zip(prefix, levelName)]
 	levelNameSorted = dict(zip(levelName, sortedLevel))
 	# Create sorted level name for all doors
 	sortedDoorLevels = []
 	for d in doorsCollector:
-		for levelN in levelName:
+		try:
 			eId = d.get_Parameter(DB.BuiltInParameter.FAMILY_LEVEL_PARAM).AsElementId()
 			level = doc.GetElement(eId)
-			if level.Name == levelN:
-				sortedDoorLevels.append(levelNameSorted[levelN])
+			if level.Name in levelName:
+				sortedDoorLevels.append(levelNameSorted[level.Name])
+		except:
+			sortedDoorsLevels.append("")
 	return sortedDoorLevels
 
 # Function to number doors
@@ -120,7 +118,7 @@ def numberDoors():
 	doorNumbers = []
 	department = []
 	rooms = doorRooms(filteredDoorsInPhase, selectedPhase)
-	sortedLevels = sortLevels()
+	sortedLevels = sortLevels(filteredDoorsInPhase)
 	roomName = []
 	roomNumber = []
 
@@ -171,7 +169,7 @@ def numberDoors():
 
 # Select all doors
 doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
-doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType()
+doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType().ToElements()
 
 # Call function to number doors
 numberDoors()
