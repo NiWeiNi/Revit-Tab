@@ -100,7 +100,7 @@ def sortLevels(doorsCollector):
 	return sortedDoorLevels
 
 # Function to number doors
-def numberDoors():
+def numberDoors(doorsCollector):
 	# Check project parameters
 	checkProjParam("Doors", "Department")
 	checkProjParam("Doors", "Room Number")
@@ -117,13 +117,13 @@ def numberDoors():
 	countNumbers = {}
 	doorNumbers = []
 	department = []
-	rooms = doorRooms(filteredDoorsInPhase, selectedPhase)
-	sortedLevels = sortLevels(filteredDoorsInPhase)
+	rooms = doorRooms(doorsCollector, selectedPhase)
+	sortedLevels = sortLevels(doorsCollector)
 	roomName = []
 	roomNumber = []
 
 	# Loop through all  rooms
-	for r, d in zip(rooms, filteredDoorsInPhase):
+	for r, d in zip(rooms, doorsCollector):
 		# Check room is not null
 		if r != None:
 			department.append(r.LookupParameter("Department").AsString())
@@ -156,7 +156,7 @@ def numberDoors():
 
 	# Set Door Number and Department in doors
 	# Door Number is set as instance parameter which value can vary across groups. Default Mark doesn't work properly as it needs to be ungrouped.
-	for d, n, dep, numb, nam, sL in zip(filteredDoorsInPhase, doorNumbers, department, roomNumber, roomName, sortedLevels):
+	for d, n, dep, numb, nam, sL in zip(doorsCollector, doorNumbers, department, roomNumber, roomName, sortedLevels):
 		# Use overloads with a string as IronPython will throw an error by using same string
 		d.LookupParameter("Door Number").Set.Overloads[str](n)
 		d.LookupParameter("Department").Set.Overloads[str](dep)
@@ -168,8 +168,17 @@ def numberDoors():
 	t.Commit()
 
 # Select all doors
-doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
-doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType().ToElements()
+#doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
+#doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType().ToElements()
+
+# Retrieve Door Schedule
+views = DB.FilteredElementCollector(doc).OfClass(DB.View)
+scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower()]
+
+# Retrieve doors from schedule
+doorsSchedule = DB.FilteredElementCollector(doc, scheId[0])
+doorsCollector = [d for d in doorsSchedule if d.Category.Name == "Doors"]
+print len(doorsCollector)
 
 # Call function to number doors
-numberDoors()
+numberDoors(doorsCollector)
