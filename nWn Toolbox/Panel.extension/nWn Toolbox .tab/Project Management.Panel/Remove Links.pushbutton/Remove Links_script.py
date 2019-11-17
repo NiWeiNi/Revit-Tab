@@ -15,57 +15,33 @@ from pyrevit import forms
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
-# Collects all sheets in current document
-linksCollector = FilteredElementCollector(doc).OfClass(ImportInstance)
+# Collect all imported elements
+linksCollector = DB.FilteredElementCollector(doc).OfClass(DB.ImportInstance)
 
+# Helper variables
+linksDelete = []
+linkSuccess = []
+linksFail = []
+
+# Collect all links with external path file
 for e in linksCollector:
-	print e.IsLinked
-	print e.Category.Name
-
-
-"""
-# Create a Transaction group to group all subsequent transactions
-tg = TransactionGroup(doc, "Update Drawn By and Checked By")
-
-# Start the group transaction
-tg.Start()
+    if e.IsLinked:
+        l = DB.ExternalFileUtils.GetExternalFileReference(doc, e.GetTypeId())
+        # Retrieve links that are not Loaded
+        status = l.GetLinkedFileStatus()
+        if status != DB.LinkedFileStatus.Loaded:
+            linksDelete.append(e.Id)
 
 # Create a individual transaction to change the parameters on sheet
-t = Transaction(doc, "Change Sheets Name")
-
+t = DB.Transaction(doc, "Delete CAD Links")
 # Start individual transaction
 t.Start()
 
-# Variable to store modified sheets
-modSheets = list()
-
-# Define function to modify parameter
-def modParameter(param, checkEmpty, inputParam):
-    # Store the sheet number parameter in variable
-    sheetNumber = sheet.LookupParameter("Sheet Number").AsString()
-    # Retrieve sheet parameter
-    sheetDrawn = sheet.LookupParameter(param)
-    # Check if it is by default and input is not empty, set it with user input
-    if sheetDrawn.AsString() == checkEmpty and inputParam != "":
-        sheetDrawn.Set(inputParam)
-        # Check if the sheet has been previously modified and append to list
-        if sheetNumber not in modSheets:
-            modSheets.append(sheetNumber)
-
-# Loop through all sheets
-for sheet in sheetsCollector:
-    # Run function to modify Drawer
-    modParameter("Drawn By", "Author", nameDrawer)
-    # Call function to modify Checker
-    modParameter("Checked By", "Checker", nameChecker)
+# Loop to delete all links
+for linkDel in linksDelete:
+    doc.Delete(linkDel)
 
 # Commit individual transaction
 t.Commit()
 
-# Combine all individual transaction in the group transaction
-tg.Assimilate()
-
-# Print all changed sheets
-print("The following sheets have been modified: \n\n" + "\n".join(modSheets))
-
-	"""
+# Print removed links
