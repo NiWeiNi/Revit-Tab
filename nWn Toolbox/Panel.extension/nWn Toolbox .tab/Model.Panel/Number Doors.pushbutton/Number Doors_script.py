@@ -62,13 +62,13 @@ def doorRooms(doorsCollector, selectedPhase):
 		fromRoom = d.FromRoom[selectedPhase]
 		# Pick preferred ToRoom parameter as default room
 		if toRoom != None:
-			if fromRoom != None:
-				if ("ensuite" in fromRoom.LookupParameter("Name").AsString().lower() or 
-					"bath" in fromRoom.LookupParameter("Name").AsString().lower() or
-					"b-ens" in fromRoom.LookupParameter("Name").AsString().lower()):
-					room = fromRoom
+			if fromRoom != None and toRoom.LookupParameter("Name").AsString().lower().find("ensuite"):
+				print "Hello"
+				room = fromRoom
+				print fromRoom.Number
 			else:
 				room = toRoom
+		
 		# Default to FromRoom
 		else:
 			room = fromRoom
@@ -178,7 +178,6 @@ scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower()]
 # Retrieve doors from schedule
 doorsSchedule = DB.FilteredElementCollector(doc, scheId[0])
 doorsCollector = [d for d in doorsSchedule if d.Category.Name == "Doors"]
-print len(doorsCollector)
 
 # Call function to number doors
 numberDoors(doorsCollector)

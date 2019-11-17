@@ -17,7 +17,7 @@ uidoc = __revit__.ActiveUIDocument
 
 # Collect all imported elements
 linksCollector = DB.FilteredElementCollector(doc).OfClass(DB.ImportInstance)
-
+revitLinkCollector = DB.FilteredElementCollector(doc).OfClass(DB.RevitLinkType)
 # Helper variables
 linksDelete = []
 linkSuccess = []
@@ -32,8 +32,14 @@ for e in linksCollector:
         if status != DB.LinkedFileStatus.Loaded:
             linksDelete.append(e.Id)
 
+# Check Revit links are loaded
+for rLink in revitLinkCollector:
+    # Retrieve Ids of not loaded Revit links
+    if not rLink.IsLoaded(doc, rLink.Id):
+        linksDelete.append(rLink.Id)
+
 # Create a individual transaction to change the parameters on sheet
-t = DB.Transaction(doc, "Delete CAD Links")
+t = DB.Transaction(doc, "Delete Unloaded Links")
 # Start individual transaction
 t.Start()
 
