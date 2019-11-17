@@ -6,16 +6,12 @@ NOTE: Includes images, CAD Links and Revit Links.
 __title__ = 'Clean Unused\nLinks'
 __author__ = "nWn"
 
-# Import commom language runtime
-import clr
+# Import 
+from pyrevit import revit, DB
+from pyrevit import script
+from pyrevit import forms
 
-# Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, ImportInstance, BuiltInCategory, \
-                            Transaction, TransactionGroup
-
-
-# Store current document to variable
-app = __revit__.Application
+# Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
