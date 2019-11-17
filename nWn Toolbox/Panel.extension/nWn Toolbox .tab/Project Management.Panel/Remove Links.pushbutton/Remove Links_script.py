@@ -18,6 +18,8 @@ uidoc = __revit__.ActiveUIDocument
 # Collect all imported elements
 linksCollector = DB.FilteredElementCollector(doc).OfClass(DB.ImportInstance)
 revitLinkCollector = DB.FilteredElementCollector(doc).OfClass(DB.RevitLinkType)
+imagesCollector = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_RasterImages)
+
 # Helper variables
 linksDelete = []
 linkSuccess = []
@@ -37,6 +39,16 @@ for rLink in revitLinkCollector:
     # Retrieve Ids of not loaded Revit links
     if not rLink.IsLoaded(doc, rLink.Id):
         linksDelete.append(rLink.Id)
+
+# Check images are loaded
+for i in imagesCollector:
+    print i
+    param = i.Parameters
+    for p in param:
+        print p.Definition.Name
+    # retrieve Ids of images that are not loaded
+    print i.GetTypeId()
+    print i.Id
 
 # Create a individual transaction to change the parameters on sheet
 t = DB.Transaction(doc, "Delete Unloaded Links")
