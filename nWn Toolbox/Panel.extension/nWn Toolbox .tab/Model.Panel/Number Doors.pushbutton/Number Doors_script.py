@@ -26,6 +26,16 @@ def checkProjParam(catName, paramName):
 	# Finish script if there is no required project parameter 
 	forms.alert("Please create Project Parameter named " + paramName + " under " + catName + " category.", ok = True, exitscript= True)
 
+# Function to check if view exists
+def checkView(viewName):
+	# Retrieve views
+	views = DB.FilteredElementCollector(doc).OfClass(DB.View)
+	# Check that Door Schedule exists in model
+	for v in views:
+		if v.Name.lower() == viewName.lower():
+			return True
+	forms.alert("Please create door schedule named Door Schedule with all doors to number", ok = True, exitscript= True)
+
 # Function to select phase
 def selectPhase(doorsCollector):
 	phase = ""
@@ -89,12 +99,23 @@ def sortLevels(doorsCollector):
 	return sortedDoorLevels
 
 # Function to number doors
-def numberDoors(doorsCollector):
+def numberDoors():
 	# Check project parameters
 	checkProjParam("Doors", "Department")
 	checkProjParam("Doors", "Room Number")
 	checkProjParam("Doors", "Room Name")
 	checkProjParam("Doors", "Door Number")
+
+	# Check schedule view in project
+	checkView("Door Schedule")
+
+	# Retrieve Door Schedule
+	views = DB.FilteredElementCollector(doc).OfClass(DB.View)
+	scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower()]
+
+	# Retrieve doors from schedule
+	doorsSchedule = DB.FilteredElementCollector(doc, scheId[0])
+	doorsCollector = [d for d in doorsSchedule if d.Category.Name == "Doors"]
 
 	# Select phase
 	selectedPhase = selectPhase(doorsCollector)
@@ -156,13 +177,5 @@ def numberDoors(doorsCollector):
 	# Commit transaction
 	t.Commit()
 
-# Retrieve Door Schedule
-views = DB.FilteredElementCollector(doc).OfClass(DB.View)
-scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower()]
-
-# Retrieve doors from schedule
-doorsSchedule = DB.FilteredElementCollector(doc, scheId[0])
-doorsCollector = [d for d in doorsSchedule if d.Category.Name == "Doors"]
-
 # Call function to number doors
-numberDoors(doorsCollector)
+numberDoors()
