@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Number doors according to room number and assign department.
+"""Number doors according filling Door Number, Room Number, Room Name, Department and Level Sorted.
 
-NOTE: Room name will be assigned according to To Room parameter except rooms named Ensuites or Bathrooms that pick From Room.
+NOTE: Room name will be assigned according to To Room parameter except for the selected rooms which will use From Room.
 """
 __author__ = "nWn"
 __title__ = "Number\n Doors"
@@ -35,15 +35,18 @@ def selectPhase(doorsCollector):
 		break
 	return phase
 
-# Function to retrieve selected phase
-def retPhase(phaseName):
-	phases = doc.Phases
-	for ph in phases:
-		if ph.Name == phaseName:
-			return ph
+# Function to display select room names
+def roomNames():
+	# Collect all rooms
+	rooms = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Rooms)
+	# Create set of rooms
+	roomNames = [r.LookupParameter("Name").AsString() for r in rooms]
+	roomSet = sorted(set(roomNames))
+	# Prompt selection list
+	return forms.SelectFromList.show(roomSet, "Rooms with reverse opening", 600, 600, multiselect = True)
 
 # Function to retrieve door rooms
-def doorRooms(doorsCollector, selectedPhase):
+def doorRooms(doorsCollector, selectedPhase, roomsExcluded):
 	rooms = []
 	room = None
 	for d in doorsCollector:
@@ -51,7 +54,7 @@ def doorRooms(doorsCollector, selectedPhase):
 		fromRoom = d.FromRoom[selectedPhase]
 		# Pick preferred ToRoom parameter as default room
 		if toRoom != None:
-			if fromRoom != None and fromRoom.LookupParameter("Name").AsString().lower().find("en") != -1:
+			if fromRoom != None and fromRoom.LookupParameter("Name").AsString() in roomsExcluded:
 				room = fromRoom
 			else:
 				room = toRoom
@@ -96,11 +99,14 @@ def numberDoors(doorsCollector):
 	# Select phase
 	selectedPhase = selectPhase(doorsCollector)
 
+	# Select rooms with reverse door openings
+	reverseRooms = roomNames()
+
 	# Set auxiliar variables
 	countNumbers = {}
 	doorNumbers = []
 	department = []
-	rooms = doorRooms(doorsCollector, selectedPhase)
+	rooms = doorRooms(doorsCollector, selectedPhase, reverseRooms)
 	sortedLevels = sortLevels(doorsCollector)
 	roomName = []
 	roomNumber = []
