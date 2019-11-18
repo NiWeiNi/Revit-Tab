@@ -27,14 +27,13 @@ def checkProjParam(catName, paramName):
 	forms.alert("Please create Project Parameter named " + paramName + " under " + catName + " category.", ok = True, exitscript= True)
 
 # Function to select phase
-def selectPhase():
-	# Select all phases
-	phases = doc.Phases
-	phasesName = [ph.Name for ph in phases]
-
-	# Form to select phase
-	phaseForm = forms.SelectFromList.show(phasesName, title = "Select Phase")
-	return phaseForm
+def selectPhase(doorsCollector):
+	phase = ""
+	for d in doorsCollector:
+		phaseId = d.CreatedPhaseId
+		phase = doc.GetElement(phaseId)
+		break
+	return phase
 
 # Function to retrieve selected phase
 def retPhase(phaseName):
@@ -42,16 +41,6 @@ def retPhase(phaseName):
 	for ph in phases:
 		if ph.Name == phaseName:
 			return ph
-
-# Function filter doors in selected phase
-def doorsInPhase(doorsCollector, selectedPhase):
-	doorsInPhase = []
-	for d in doorsCollector:
-		eId = d.get_Parameter(DB.BuiltInParameter.PHASE_CREATED).AsElementId()
-		phase = doc.GetElement(eId)
-		if phase.Name == selectedPhase.Name:
-			doorsInPhase.append(d)
-	return doorsInPhase
 
 # Function to retrieve door rooms
 def doorRooms(doorsCollector, selectedPhase):
@@ -62,13 +51,10 @@ def doorRooms(doorsCollector, selectedPhase):
 		fromRoom = d.FromRoom[selectedPhase]
 		# Pick preferred ToRoom parameter as default room
 		if toRoom != None:
-			if fromRoom != None and toRoom.LookupParameter("Name").AsString().lower().find("ensuite"):
-				print "Hello"
+			if fromRoom != None and fromRoom.LookupParameter("Name").AsString().lower().find("en") != -1:
 				room = fromRoom
-				print fromRoom.Number
 			else:
 				room = toRoom
-		
 		# Default to FromRoom
 		else:
 			room = fromRoom
@@ -108,10 +94,7 @@ def numberDoors(doorsCollector):
 	checkProjParam("Doors", "Door Number")
 
 	# Select phase
-	selectedPhase = retPhase(selectPhase())
-
-	# Filter doors
-	filteredDoorsInPhase = doorsInPhase(doorsCollector, selectedPhase)
+	selectedPhase = selectPhase(doorsCollector)
 
 	# Set auxiliar variables
 	countNumbers = {}
@@ -166,10 +149,6 @@ def numberDoors(doorsCollector):
 
 	# Commit transaction
 	t.Commit()
-
-# Select all doors
-#doorsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Doors)
-#doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).WhereElementIsNotElementType().ToElements()
 
 # Retrieve Door Schedule
 views = DB.FilteredElementCollector(doc).OfClass(DB.View)
