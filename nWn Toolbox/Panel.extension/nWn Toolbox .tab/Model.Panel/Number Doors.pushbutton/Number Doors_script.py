@@ -111,8 +111,7 @@ def numberDoors():
 
 	# Retrieve Door Schedule
 	views = DB.FilteredElementCollector(doc).OfClass(DB.View)
-	scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower()]
-
+	scheId = [x.Id for x in views if x.Name.lower() == "Door Schedule".lower() and x.ViewType == DB.ViewType.Schedule]
 	# Retrieve doors from schedule
 	doorsSchedule = DB.FilteredElementCollector(doc, scheId[0])
 	doorsCollector = [d for d in doorsSchedule if d.Category.Name == "Doors"]
