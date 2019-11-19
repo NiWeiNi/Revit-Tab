@@ -26,33 +26,117 @@ from System.Drawing import Point, Size
 from System.Windows.Forms import Application, Button, Form, Label, TextBox, FolderBrowserDialog, DialogResult
 
 # Create a class form
-class CreateWindow(Form):
-	def __init__(self, title, author):
+class MultiStringWindow(Form):
+	def __init__(self, title):
 		# Create the form
 		self.Name = "Create Window"
 		self.Text = title
-		self.Size = Size(500, 150)
+		self.Size = Size(500, 500)
 		self.CenterToScreen()
 		
 		self.value = ""
+		self.value1 = ""
+		self.value2 = ""
+		self.value3 = ""
+		self.value4 = ""
+		self.value5 = ""
+		self.value6 = ""
+		self.value7 = ""
+		self.finalValue = []
 		
 		# Create label for input title
-		labelDiv = Label(Text = author + ":")
+		labelDiv = Label(Text = "Door Type")
 		labelDiv.Parent = self
-		labelDiv.Size = Size(100, 150)
-		labelDiv.Location = Point(30, 20)
-		
+		labelDiv.Size = Size(200, 20)
+		labelDiv.Location = Point(30, 40)
 		# Create TextBox for input
 		self.textboxDiv = TextBox()
 		self.textboxDiv.Parent = self
 		self.textboxDiv.Text = ""
-		self.textboxDiv.Location = Point(300, 20)
+		self.textboxDiv.Location = Point(300, 40)
+
+		# Create label for input title
+		labelDiv1 = Label(Text = "Door Frame Type")
+		labelDiv1.Parent = self
+		labelDiv1.Size = Size(200, 20)
+		labelDiv1.Location = Point(30, 80)
+		# Create TextBox for input
+		self.textboxDiv1 = TextBox()
+		self.textboxDiv1.Parent = self
+		self.textboxDiv1.Text = ""
+		self.textboxDiv1.Location = Point(300, 80)
+
+		# Create label for input title
+		labelDiv2 = Label(Text = "Door Frame Finish")
+		labelDiv2.Parent = self
+		labelDiv2.Size = Size(200, 20)
+		labelDiv2.Location = Point(30, 120)
+		# Create TextBox for input
+		self.textboxDiv2 = TextBox()
+		self.textboxDiv2.Parent = self
+		self.textboxDiv2.Text = ""
+		self.textboxDiv2.Location = Point(300, 120)
+
+		# Create label for input title
+		labelDiv3 = Label(Text = "Door Leaf Type")
+		labelDiv3.Parent = self
+		labelDiv3.Size = Size(200, 20)
+		labelDiv3.Location = Point(30, 160)
+		# Create TextBox for input
+		self.textboxDiv3 = TextBox()
+		self.textboxDiv3.Parent = self
+		self.textboxDiv3.Text = ""
+		self.textboxDiv3.Location = Point(300, 160)
+
+		# Create label for input title
+		labelDiv4 = Label(Text = "Door Leaf Finish")
+		labelDiv4.Parent = self
+		labelDiv4.Size = Size(200, 20)
+		labelDiv4.Location = Point(30, 200)
+		# Create TextBox for input
+		self.textboxDiv4 = TextBox()
+		self.textboxDiv4.Parent = self
+		self.textboxDiv4.Text = ""
+		self.textboxDiv4.Location = Point(300, 200)
+
+		# Create label for input title
+		labelDiv5 = Label(Text = "Fire/Smoke")
+		labelDiv5.Parent = self
+		labelDiv5.Size = Size(200, 20)
+		labelDiv5.Location = Point(30, 240)
+		# Create TextBox for input
+		self.textboxDiv5 = TextBox()
+		self.textboxDiv5.Parent = self
+		self.textboxDiv5.Text = ""
+		self.textboxDiv5.Location = Point(300, 240)
+
+		# Create label for input title
+		labelDiv6 = Label(Text = "Misc")
+		labelDiv6.Parent = self
+		labelDiv6.Size = Size(200, 20)
+		labelDiv6.Location = Point(30, 280)
+		# Create TextBox for input
+		self.textboxDiv6 = TextBox()
+		self.textboxDiv6.Parent = self
+		self.textboxDiv6.Text = ""
+		self.textboxDiv6.Location = Point(300, 280)
+
+		# Create label for input title
+		labelDiv7 = Label(Text = "Comments")
+		labelDiv7.Parent = self
+		labelDiv7.Size = Size(200, 20)
+		labelDiv7.Location = Point(30, 320)
+		# Create TextBox for input
+		self.textboxDiv7 = TextBox()
+		self.textboxDiv7.Parent = self
+		self.textboxDiv7.Text = ""
+		self.textboxDiv7.Location = Point(300, 320)
 	
 		# Create button
 		button = Button()
 		button.Parent = self
 		button.Text = "Ok"
-		button.Location = Point(300, 60)
+		button.Location = Point(300, 360)
 		
 		# Register event
 		button.Click += self.ButtonClicked
@@ -62,6 +146,14 @@ class CreateWindow(Form):
 			# Handle non numeric cases
 			try:
 				self.value = self.textboxDiv.Text
+				self.value1 = self.textboxDiv1.Text
+				self.value2 = self.textboxDiv2.Text
+				self.value3 = self.textboxDiv3.Text
+				self.value4 = self.textboxDiv4.Text
+				self.value5 = self.textboxDiv5.Text
+				self.value6 = self.textboxDiv6.Text
+				self.value7 = self.textboxDiv7.Text
+				self.finalValue = [self.value, self.value1, self.value2, self.value3, self.value4, self.value5, self.value6, self.value7]
 				self.Close()
 			except:
 				self.Close()
@@ -74,36 +166,13 @@ doorsCollector = DB.FilteredElementCollector(doc).WherePasses(doorsFilter).Where
 roomNames = sorted(list(set([d.LookupParameter("Room Name").AsString() for d in doorsCollector])))
 
 # Create form to select doors by Room Name
-roomNameDoors = forms.SelectFromList.show(roomNames, "View Templates", 600, 300, multiselect=True)
+roomNameDoors = forms.SelectFromList.show(roomNames, "Select Rooms with Doors to Add Parameters", 600, 600, multiselect=True)
 
 # Select doors to modify
 modiDoors = [d for d in doorsCollector if d.LookupParameter("Room Name").AsString() in roomNameDoors]
 
-# Create form to input parameters
 # Call the CreateWindow class
-formDoorType = CreateWindow("Door Parameter", "Input Door Type: ")
+formDoorType = MultiStringWindow("Door Parameters")
 Application.Run(formDoorType)
 # Assign the input to variable
-doorType = formDoorType.value
-
-# Call the CreateWindow class
-formLeafFinish = CreateWindow("Door Parameter", "Input Leaf Finish: ")
-Application.Run(formLeafFinish)
-# Assign the input to variable
-leafFinish = formLeafFinish.value
-
-# Call the CreateWindow class
-formFrameType = CreateWindow("Door Parameter", "Input Frame Type: ")
-Application.Run(formFrameType)
-# Assign the input to variable
-frameType = formFrameType.value
-
-# Call the CreateWindow class
-formframeFinish = CreateWindow("Door Parameter", "Input Frame Finish: ")
-Application.Run(formframeFinish)
-# Assign the input to variable
-frameFinish = formframeFinish.value
-
-# User Input Door Parameters
-userDoorParams = [doorType, leafFinish, frameType, frameFinish]
-
+dParams = formDoorType.finalValue
