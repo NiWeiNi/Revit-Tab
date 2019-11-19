@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Select doors in rooms and fill in parameters.
 
-NOTE: 
+NOTE: Leave parameters unfilled will delete previous filled parameters.
 """
 __author__ = "nWn"
 __title__ = "Fill Doors\n Params"
@@ -176,3 +176,22 @@ formDoorType = MultiStringWindow("Door Parameters")
 Application.Run(formDoorType)
 # Assign the input to variable
 dParams = formDoorType.finalValue
+
+# Set parameters for doors
+# Create a individual transaction to change the parameters
+t = DB.Transaction(doc, "Set Door Parameters")
+# Start individual transaction
+t.Start()
+for d in modiDoors:
+	# Use overloads with a string as IronPython will throw an error by using same string
+	d.LookupParameter("Door Type").Set.Overloads[str](dParams[0])
+	d.LookupParameter("Door Frame Type").Set.Overloads[str](dParams[1])
+	d.LookupParameter("Door Frame Finish").Set.Overloads[str](dParams[2])
+	d.LookupParameter("Door Leaf Type").Set.Overloads[str](dParams[3])
+	d.LookupParameter("Door Leaf Finish").Set.Overloads[str](dParams[4])
+	d.LookupParameter("Door-Fire/Smoke").Set.Overloads[str](dParams[5])
+	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[6])
+	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[7])
+
+# Commit transaction
+t.Commit()
