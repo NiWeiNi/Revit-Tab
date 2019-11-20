@@ -11,6 +11,9 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
+# Import xlsxwriter
+import xlsxwriter
+
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
@@ -39,3 +42,21 @@ for i in range(numbRows):
         content = sched.GetCellText(DB.SectionType.Body, i, j)
         rows.append(content)
     data.append(rows)
+
+# Export data to excel
+workbook = xlsxwriter.Workbook('Expenses01.xlsx')
+worksheet = workbook.add_worksheet()
+
+# Start from the first cell. Rows and columns are zero indexed.
+row = 0
+col = 0
+
+# Iterate over the data and write it out row by row.
+for item in data:
+    for it in item:
+        worksheet.write(row, col, it)
+        col += 1
+    row += 1
+    col = 0
+
+workbook.close()
