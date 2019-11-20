@@ -15,6 +15,15 @@ from pyrevit import forms
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Function to check file is not workshared in the server
+def checkCentral():
+    if forms.check_workshared(doc=revit.doc):
+        centralPath = revit.query.get_central_path(doc=revit.doc)
+        if centralPath.startswith("C:"):
+            return True
+        else:
+            return False
+
 # Collect all views and sheets
 viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
 sheetsCollector = DB.FilteredElementCollector(doc).OfClass(DB.ViewSheet)
