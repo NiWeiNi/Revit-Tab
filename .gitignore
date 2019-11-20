@@ -1,0 +1,5 @@
+# Don't track content of these folders
+/.vscode/
+
+# Don't track these files
+/Schedules.Panel/Export to Excel.pushbutton/Thumbs.db

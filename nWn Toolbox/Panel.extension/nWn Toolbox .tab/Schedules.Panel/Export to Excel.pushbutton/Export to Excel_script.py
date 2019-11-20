@@ -46,6 +46,15 @@ for i in range(numbRows):
         rows.append(content)
     data.append(rows)
 
+# Check maximun length of data in columns
+lengths = [len(x) for x in data[0]]
+for row in data:
+    for cell, lng in zip(row, lengths):
+        newLength = len(cell)
+        if newLength > lng:
+            ind = lengths.index(lng)
+            lengths[ind] = newLength
+
 # Export data to excel
 workbook = xlsxwriter.Workbook(destinationFolder + "\\" + sched.Name + ".xlsx")
 worksheet = workbook.add_worksheet()
