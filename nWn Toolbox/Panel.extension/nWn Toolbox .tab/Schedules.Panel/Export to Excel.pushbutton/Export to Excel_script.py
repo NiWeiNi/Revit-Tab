@@ -28,6 +28,9 @@ schedNames = [x.Name for x in schedules]
 selectedSched = forms.SelectFromList.show(schedNames, button_name="Select Schedule to Export")
 sched = [x for x in schedules if x.Name == selectedSched][0]
 
+# Select folder to export excel
+destinationFolder = forms.pick_folder()
+
 # Retrieve data from the schedule
 tableData = sched.GetTableData()
 sectionData = tableData.GetSectionData(DB.SectionType.Body)
@@ -44,7 +47,7 @@ for i in range(numbRows):
     data.append(rows)
 
 # Export data to excel
-workbook = xlsxwriter.Workbook('Expenses01.xlsx')
+workbook = xlsxwriter.Workbook(destinationFolder + "\\" + sched.Name + ".xlsx")
 worksheet = workbook.add_worksheet()
 
 # Start from the first cell. Rows and columns are zero indexed.
