@@ -60,21 +60,33 @@ workbook = xlsxwriter.Workbook(destinationFolder + "\\" + sched.Name + ".xlsx")
 worksheet = workbook.add_worksheet(sched.Name)
 
 # Define format for cells
-cellFormat = workbook.add_format({'font_size': 12})
+fontSize = 12
+fillColor = "navy"
+titleFormat = workbook.add_format({"bold": True, "font_size": fontSize})
+subtitleFormat = workbook.add_format({"bg_color": fillColor, "bold": True, 'font_color': "white", "font_size": fontSize})
+cellFormat = workbook.add_format({"font_size": fontSize})
 
 # Set columns width
 for le, i in zip(lengths, range(len(lengths))):
-    print i
     worksheet.set_column(i, i, le)
 
 # Start from the first cell. Rows and columns are zero indexed.
 row = 1
 col = 0
 
+# Set title of schedule
+worksheet.write(0, 0, sched.Name.upper(), titleFormat)
+
 # Iterate over the data and write it out row by row.
 for item in data:
+    first, rest = item[0], item[1:]
     for it in item:
-        worksheet.write(row, col, it, cellFormat)
+        if (first != "" and rest.count("") == len(lengths)-1) or item.count("") == len(lengths):
+            worksheet.write(row, col, it, subtitleFormat)
+        elif row == 1:
+            worksheet.write(row, col, it, titleFormat)
+        else:
+            worksheet.write(row, col, it, cellFormat)
         col += 1
     row += 1
     col = 0
