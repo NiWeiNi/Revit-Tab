@@ -42,6 +42,7 @@ class MultiStringWindow(Form):
 		self.value5 = ""
 		self.value6 = ""
 		self.value7 = ""
+		self.value8 = ""
 		self.finalValue = []
 		
 		# Create label for input title
@@ -111,7 +112,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv5.Location = Point(300, 240)
 
 		# Create label for input title
-		labelDiv6 = Label(Text = "Misc")
+		labelDiv6 = Label(Text = "Door Security")
 		labelDiv6.Parent = self
 		labelDiv6.Size = Size(200, 20)
 		labelDiv6.Location = Point(30, 280)
@@ -122,7 +123,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv6.Location = Point(300, 280)
 
 		# Create label for input title
-		labelDiv7 = Label(Text = "Comments")
+		labelDiv7 = Label(Text = "Misc")
 		labelDiv7.Parent = self
 		labelDiv7.Size = Size(200, 20)
 		labelDiv7.Location = Point(30, 320)
@@ -131,12 +132,23 @@ class MultiStringWindow(Form):
 		self.textboxDiv7.Parent = self
 		self.textboxDiv7.Text = ""
 		self.textboxDiv7.Location = Point(300, 320)
+
+		# Create label for input title
+		labelDiv8 = Label(Text = "Comments")
+		labelDiv8.Parent = self
+		labelDiv8.Size = Size(200, 20)
+		labelDiv8.Location = Point(30, 360)
+		# Create TextBox for input
+		self.textboxDiv8 = TextBox()
+		self.textboxDiv8.Parent = self
+		self.textboxDiv8.Text = ""
+		self.textboxDiv8.Location = Point(300, 360)
 	
 		# Create button
 		button = Button()
 		button.Parent = self
 		button.Text = "Ok"
-		button.Location = Point(300, 360)
+		button.Location = Point(300, 400)
 		
 		# Register event
 		button.Click += self.ButtonClicked
@@ -153,7 +165,8 @@ class MultiStringWindow(Form):
 				self.value5 = self.textboxDiv5.Text
 				self.value6 = self.textboxDiv6.Text
 				self.value7 = self.textboxDiv7.Text
-				self.finalValue = [self.value, self.value1, self.value2, self.value3, self.value4, self.value5, self.value6, self.value7]
+				self.value8 = self.textboxDiv8.Text
+				self.finalValue = [self.value, self.value1, self.value2, self.value3, self.value4, self.value5, self.value6, self.value7, self.value8]
 				self.Close()
 			except:
 				self.Close()
@@ -192,6 +205,7 @@ for d in modiDoors:
 	d.LookupParameter("Door-Fire/Smoke").Set.Overloads[str](dParams[5])
 	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[6])
 	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[7])
+	d.LookupParameter("Door Security").Set.Overloads[str](dParams[8])
 
 # Commit transaction
 t.Commit()
