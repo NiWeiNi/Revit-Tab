@@ -54,19 +54,27 @@ for row in data:
         if newLength > lng:
             ind = lengths.index(lng)
             lengths[ind] = newLength
-
+            
 # Export data to excel
 workbook = xlsxwriter.Workbook(destinationFolder + "\\" + sched.Name + ".xlsx")
-worksheet = workbook.add_worksheet()
+worksheet = workbook.add_worksheet(sched.Name)
+
+# Define format for cells
+cellFormat = workbook.add_format({'font_size': 12})
+
+# Set columns width
+for le, i in zip(lengths, range(len(lengths))):
+    print i
+    worksheet.set_column(i, i, le)
 
 # Start from the first cell. Rows and columns are zero indexed.
-row = 0
+row = 1
 col = 0
 
 # Iterate over the data and write it out row by row.
 for item in data:
     for it in item:
-        worksheet.write(row, col, it)
+        worksheet.write(row, col, it, cellFormat)
         col += 1
     row += 1
     col = 0
