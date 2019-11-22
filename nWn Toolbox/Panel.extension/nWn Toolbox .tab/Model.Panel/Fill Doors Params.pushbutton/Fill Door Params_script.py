@@ -31,7 +31,7 @@ class MultiStringWindow(Form):
 		# Create the form
 		self.Name = "Create Window"
 		self.Text = title
-		self.Size = Size(370, 550)
+		self.Size = Size(370, 590)
 		self.CenterToScreen()
 		
 		self.value = ""
@@ -101,7 +101,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv4.Location = Point(200, 200)
 
 		# Create label for input title
-		labelDiv5 = Label(Text = "Door Leaf Finish")
+		labelDiv5 = Label(Text = "Door Leaf Material")
 		labelDiv5.Parent = self
 		labelDiv5.Size = Size(150, 20)
 		labelDiv5.Location = Point(30, 240)
@@ -112,7 +112,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv5.Location = Point(200, 240)
 
 		# Create label for input title
-		labelDiv6 = Label(Text = "Fire/Smoke")
+		labelDiv6 = Label(Text = "Door Leaf Finish")
 		labelDiv6.Parent = self
 		labelDiv6.Size = Size(150, 20)
 		labelDiv6.Location = Point(30, 280)
@@ -123,7 +123,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv6.Location = Point(200, 280)
 
 		# Create label for input title
-		labelDiv7 = Label(Text = "Door Security")
+		labelDiv7 = Label(Text = "Fire/Smoke")
 		labelDiv7.Parent = self
 		labelDiv7.Size = Size(150, 20)
 		labelDiv7.Location = Point(30, 320)
@@ -134,7 +134,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv7.Location = Point(200, 320)
 
 		# Create label for input title
-		labelDiv8 = Label(Text = "Misc")
+		labelDiv8 = Label(Text = "Door Security")
 		labelDiv8.Parent = self
 		labelDiv8.Size = Size(150, 20)
 		labelDiv8.Location = Point(30, 360)
@@ -145,7 +145,7 @@ class MultiStringWindow(Form):
 		self.textboxDiv8.Location = Point(200, 360)
 
 		# Create label for input title
-		labelDiv9 = Label(Text = "Comments")
+		labelDiv9 = Label(Text = "Misc")
 		labelDiv9.Parent = self
 		labelDiv9.Size = Size(150, 20)
 		labelDiv9.Location = Point(30, 400)
@@ -154,12 +154,23 @@ class MultiStringWindow(Form):
 		self.textboxDiv9.Parent = self
 		self.textboxDiv9.Text = ""
 		self.textboxDiv9.Location = Point(200, 400)
+
+		# Create label for input title
+		labelDiv10 = Label(Text = "Comments")
+		labelDiv10.Parent = self
+		labelDiv10.Size = Size(150, 20)
+		labelDiv10.Location = Point(30, 440)
+		# Create TextBox for input
+		self.textboxDiv10 = TextBox()
+		self.textboxDiv10.Parent = self
+		self.textboxDiv10.Text = ""
+		self.textboxDiv10.Location = Point(200, 440)
 	
 		# Create button
 		button = Button()
 		button.Parent = self
 		button.Text = "Ok"
-		button.Location = Point(200, 450)
+		button.Location = Point(200, 490)
 		button.Size = Size(100, 20)
 		
 		# Register event
@@ -179,7 +190,8 @@ class MultiStringWindow(Form):
 				self.value7 = self.textboxDiv7.Text
 				self.value8 = self.textboxDiv8.Text
 				self.value9 = self.textboxDiv9.Text
-				self.finalValue = [self.value, self.value1, self.value2, self.value3, self.value4, self.value5, self.value6, self.value7, self.value8, self.value9]
+				self.value10 = self.textboxDiv10.Text
+				self.finalValue = [self.value, self.value1, self.value2, self.value3, self.value4, self.value5, self.value6, self.value7, self.value8, self.value9, self.value10]
 				self.Close()
 			except:
 				self.Close()
@@ -215,11 +227,12 @@ for d in modiDoors:
 	d.LookupParameter("Door Frame Finish").Set.Overloads[str](dParams[2])
 	d.LookupParameter("Door Leaf Type").Set.Overloads[str](dParams[3])
 	d.LookupParameter("Meeting Styles").Set.Overloads[str](dParams[4])
-	d.LookupParameter("Door Leaf Finish").Set.Overloads[str](dParams[5])
-	d.LookupParameter("Door-Fire/Smoke").Set.Overloads[str](dParams[6])
-	d.LookupParameter("Door Security").Set.Overloads[str](dParams[7])
-	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[8])
-	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[9])
+	d.LookupParameter("Door Leaf Material").Set.Overloads[str](dParams[5])
+	d.LookupParameter("Door Leaf Finish").Set.Overloads[str](dParams[6])
+	d.LookupParameter("Door-Fire/Smoke").Set.Overloads[str](dParams[7])
+	d.LookupParameter("Door Security").Set.Overloads[str](dParams[8])
+	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[9])
+	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[10])
 
 # Commit transaction
 t.Commit()
