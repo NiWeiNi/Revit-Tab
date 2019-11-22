@@ -65,19 +65,20 @@ for row in data:
             
 # Export data to excel
 filePath = destinationFolder + "\\" + projNumber + "_" + sched.Name + "_" + date + ".xlsx"
-workbook = xlsxwriter.Workbook(filePath)
+workbook = xlsxwriter.Workbook(filePath, {'strings_to_numbers': True})
 worksheet = workbook.add_worksheet(sched.Name)
 
 # Define format for cells
 fontSize = 12
 fillColor = "navy"
+widthFactor = 1.5
 titleFormat = workbook.add_format({"bold": True, "font_size": fontSize})
 subtitleFormat = workbook.add_format({"bg_color": fillColor, "bold": True, 'font_color': "white", "font_size": fontSize})
-cellFormat = workbook.add_format({"font_size": fontSize})
+cellFormat = workbook.add_format({"font_size": fontSize, 'align': "left"})
 
 # Set columns width
 for le, i in zip(lengths, range(len(lengths))):
-    worksheet.set_column(i, i, le)
+    worksheet.set_column(i, i, le * widthFactor)
 
 # Start from the first cell. Rows and columns are zero indexed.
 row = 1
