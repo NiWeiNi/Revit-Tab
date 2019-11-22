@@ -31,7 +31,7 @@ class MultiStringWindow(Form):
 		# Create the form
 		self.Name = "Create Window"
 		self.Text = title
-		self.Size = Size(500, 500)
+		self.Size = Size(370, 500)
 		self.CenterToScreen()
 		
 		self.value = ""
@@ -48,107 +48,108 @@ class MultiStringWindow(Form):
 		# Create label for input title
 		labelDiv = Label(Text = "Door Type")
 		labelDiv.Parent = self
-		labelDiv.Size = Size(200, 20)
+		labelDiv.Size = Size(150, 20)
 		labelDiv.Location = Point(30, 40)
 		# Create TextBox for input
 		self.textboxDiv = TextBox()
 		self.textboxDiv.Parent = self
 		self.textboxDiv.Text = ""
-		self.textboxDiv.Location = Point(300, 40)
+		self.textboxDiv.Location = Point(200, 40)
 
 		# Create label for input title
 		labelDiv1 = Label(Text = "Door Frame Type")
 		labelDiv1.Parent = self
-		labelDiv1.Size = Size(200, 20)
+		labelDiv1.Size = Size(150, 20)
 		labelDiv1.Location = Point(30, 80)
 		# Create TextBox for input
 		self.textboxDiv1 = TextBox()
 		self.textboxDiv1.Parent = self
 		self.textboxDiv1.Text = ""
-		self.textboxDiv1.Location = Point(300, 80)
+		self.textboxDiv1.Location = Point(200, 80)
 
 		# Create label for input title
 		labelDiv2 = Label(Text = "Door Frame Finish")
 		labelDiv2.Parent = self
-		labelDiv2.Size = Size(200, 20)
+		labelDiv2.Size = Size(150, 20)
 		labelDiv2.Location = Point(30, 120)
 		# Create TextBox for input
 		self.textboxDiv2 = TextBox()
 		self.textboxDiv2.Parent = self
 		self.textboxDiv2.Text = ""
-		self.textboxDiv2.Location = Point(300, 120)
+		self.textboxDiv2.Location = Point(200, 120)
 
 		# Create label for input title
 		labelDiv3 = Label(Text = "Door Leaf Type")
 		labelDiv3.Parent = self
-		labelDiv3.Size = Size(200, 20)
+		labelDiv3.Size = Size(150, 20)
 		labelDiv3.Location = Point(30, 160)
 		# Create TextBox for input
 		self.textboxDiv3 = TextBox()
 		self.textboxDiv3.Parent = self
 		self.textboxDiv3.Text = ""
-		self.textboxDiv3.Location = Point(300, 160)
+		self.textboxDiv3.Location = Point(200, 160)
 
 		# Create label for input title
 		labelDiv4 = Label(Text = "Door Leaf Finish")
 		labelDiv4.Parent = self
-		labelDiv4.Size = Size(200, 20)
+		labelDiv4.Size = Size(150, 20)
 		labelDiv4.Location = Point(30, 200)
 		# Create TextBox for input
 		self.textboxDiv4 = TextBox()
 		self.textboxDiv4.Parent = self
 		self.textboxDiv4.Text = ""
-		self.textboxDiv4.Location = Point(300, 200)
+		self.textboxDiv4.Location = Point(200, 200)
 
 		# Create label for input title
 		labelDiv5 = Label(Text = "Fire/Smoke")
 		labelDiv5.Parent = self
-		labelDiv5.Size = Size(200, 20)
+		labelDiv5.Size = Size(150, 20)
 		labelDiv5.Location = Point(30, 240)
 		# Create TextBox for input
 		self.textboxDiv5 = TextBox()
 		self.textboxDiv5.Parent = self
 		self.textboxDiv5.Text = ""
-		self.textboxDiv5.Location = Point(300, 240)
+		self.textboxDiv5.Location = Point(200, 240)
 
 		# Create label for input title
 		labelDiv6 = Label(Text = "Door Security")
 		labelDiv6.Parent = self
-		labelDiv6.Size = Size(200, 20)
+		labelDiv6.Size = Size(150, 20)
 		labelDiv6.Location = Point(30, 280)
 		# Create TextBox for input
 		self.textboxDiv6 = TextBox()
 		self.textboxDiv6.Parent = self
 		self.textboxDiv6.Text = ""
-		self.textboxDiv6.Location = Point(300, 280)
+		self.textboxDiv6.Location = Point(200, 280)
 
 		# Create label for input title
 		labelDiv7 = Label(Text = "Misc")
 		labelDiv7.Parent = self
-		labelDiv7.Size = Size(200, 20)
+		labelDiv7.Size = Size(150, 20)
 		labelDiv7.Location = Point(30, 320)
 		# Create TextBox for input
 		self.textboxDiv7 = TextBox()
 		self.textboxDiv7.Parent = self
 		self.textboxDiv7.Text = ""
-		self.textboxDiv7.Location = Point(300, 320)
+		self.textboxDiv7.Location = Point(200, 320)
 
 		# Create label for input title
 		labelDiv8 = Label(Text = "Comments")
 		labelDiv8.Parent = self
-		labelDiv8.Size = Size(200, 20)
+		labelDiv8.Size = Size(150, 20)
 		labelDiv8.Location = Point(30, 360)
 		# Create TextBox for input
 		self.textboxDiv8 = TextBox()
 		self.textboxDiv8.Parent = self
 		self.textboxDiv8.Text = ""
-		self.textboxDiv8.Location = Point(300, 360)
+		self.textboxDiv8.Location = Point(200, 360)
 	
 		# Create button
 		button = Button()
 		button.Parent = self
 		button.Text = "Ok"
-		button.Location = Point(300, 400)
+		button.Location = Point(200, 410)
+		button.Size = Size(100, 20)
 		
 		# Register event
 		button.Click += self.ButtonClicked
@@ -203,9 +204,9 @@ for d in modiDoors:
 	d.LookupParameter("Door Leaf Type").Set.Overloads[str](dParams[3])
 	d.LookupParameter("Door Leaf Finish").Set.Overloads[str](dParams[4])
 	d.LookupParameter("Door-Fire/Smoke").Set.Overloads[str](dParams[5])
-	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[6])
-	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[7])
-	d.LookupParameter("Door Security").Set.Overloads[str](dParams[8])
+	d.LookupParameter("Door Security").Set.Overloads[str](dParams[6])
+	d.LookupParameter("Door Miscelaneous").Set.Overloads[str](dParams[7])
+	d.LookupParameter("Door Comments").Set.Overloads[str](dParams[8])
 
 # Commit transaction
 t.Commit()
