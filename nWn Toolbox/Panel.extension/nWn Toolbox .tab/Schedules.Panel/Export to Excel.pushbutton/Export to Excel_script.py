@@ -11,12 +11,20 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
-# Import xlsxwriter
+# Import libraries
 import xlsxwriter
+from datetime import datetime
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
+
+# Retrieve date
+now = datetime.now()
+date = now.strftime("%Y-%m-%d")
+
+# Retrieve project number
+projNumber = doc.ProjectInformation.Number
 
 # Retrieve Schedules
 viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
@@ -56,7 +64,8 @@ for row in data:
             lengths[ind] = newLength
             
 # Export data to excel
-workbook = xlsxwriter.Workbook(destinationFolder + "\\" + sched.Name + ".xlsx")
+filePath = destinationFolder + "\\" + projNumber + "_" + sched.Name + "_" + date + ".xlsx"
+workbook = xlsxwriter.Workbook(filePath)
 worksheet = workbook.add_worksheet(sched.Name)
 
 # Define format for cells
