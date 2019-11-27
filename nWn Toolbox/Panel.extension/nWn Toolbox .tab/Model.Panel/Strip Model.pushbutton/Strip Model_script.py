@@ -21,7 +21,11 @@ uidoc = __revit__.ActiveUIDocument
 
 # Function to check file is not workshared in the server
 def checkCentral():
-    if doc.IsWorkshared:
+    # Check central model path
+    modelPath = doc.GetWorksharingCentralModelPath()
+    centralPath = DB.ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+    # Check if model is detached or workshared in the local drive
+    if doc.IsWorkshared and not centralPath.startswith("C:"):
         return True
     else:
         return False
