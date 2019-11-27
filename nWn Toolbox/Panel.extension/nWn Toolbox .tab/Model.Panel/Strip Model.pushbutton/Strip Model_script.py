@@ -48,8 +48,14 @@ viewsIdDelete = [x.Id for x in viewsCollector if x.LookupParameter(param) == Non
 viewsIdKeep = [x.Id for x in viewsCollector if x.LookupParameter(param) != None and \
                 x.LookupParameter(param).AsString() in vSet]
 
+# Prompt form to check if user wants to keep annotations
+delAnnotations = forms.alert("Confirm to delete annotation elements", title="Delete annotations?", yes=True, no=True)
+
+# Create group transaction
+tg = DB.Transactiongroup(doc, "Delete elements in document")
+
 # Create single transaction and start it
-t = DB.Transaction(doc, "Delete elements")
+t = DB.Transaction(doc, "Delete views")
 t.Start()
 
 for v in viewsIdDelete:
@@ -60,3 +66,5 @@ for v in viewsIdDelete:
 
 # Commit transaction
 t.Commit()
+# Commit group transaction
+tg.Commit()
