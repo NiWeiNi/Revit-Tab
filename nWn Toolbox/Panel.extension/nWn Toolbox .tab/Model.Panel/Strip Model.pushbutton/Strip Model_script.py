@@ -17,12 +17,15 @@ uidoc = __revit__.ActiveUIDocument
 
 # Function to check file is not workshared in the server
 def checkCentral():
-    if forms.check_workshared(doc=revit.doc):
-        centralPath = revit.query.get_central_path(doc=revit.doc)
-        if centralPath.startswith("C:"):
-            return True
-        else:
-            return False
+    if doc.IsWorkshared:
+        return True
+    else:
+        return False
+
+# Check if model is linked to central
+if checkCentral():
+    # Finish execution script if model is not detached
+    forms.alert("Please detach model from central and save it to your local drive.", ok = True, exitscript= True)
 
 # Collect all views and sheets
 viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
