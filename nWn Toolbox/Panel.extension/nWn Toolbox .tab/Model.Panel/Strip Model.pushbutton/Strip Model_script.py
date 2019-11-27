@@ -65,11 +65,23 @@ for v in viewsIdDelete:
     except:
         pass
 
+# Check if annotation elements must be deleted
 if delAnnotations:
+    # Collect annotation categories to be deleted
+    annoElements = []
     categories = doc.Settings.Categories
     for cat in categories:
-        print cat.Name
+        if cat.CategoryType == DB.CategoryType.Annotation:
+            collector = DB.FilteredElementCollector(doc).OfCategoryId(cat.Id)
+            elemIds = [x.Id for x in collector]
+            annoElements = annoElements + elemIds
 
+# Create single transaction and start it
+t1 = DB.Transaction(doc, "Delete annotation elements")
+t1.Start()
+
+# Commit transaction
+t1.Commit()
 # Commit transaction
 t.Commit()
 # Commit group transaction
