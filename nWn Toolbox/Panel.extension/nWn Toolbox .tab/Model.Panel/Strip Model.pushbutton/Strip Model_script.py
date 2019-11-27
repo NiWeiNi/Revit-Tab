@@ -11,6 +11,10 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
+import clr
+clr.AddReference("System")
+from System.Collections.Generic import List
+
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
@@ -65,6 +69,9 @@ for v in viewsIdDelete:
     except:
         pass
 
+# Commit transaction
+t.Commit()
+
 # Check if annotation elements must be deleted
 if delAnnotations:
     # Collect annotation categories to be deleted
@@ -75,14 +82,20 @@ if delAnnotations:
             collector = DB.FilteredElementCollector(doc).OfCategoryId(cat.Id)
             elemIds = [x.Id for x in collector]
             annoElements = annoElements + elemIds
+    annoIds = List[DB.ElementId](annoElements)
+    print annoIds
 
 # Create single transaction and start it
 t1 = DB.Transaction(doc, "Delete annotation elements")
 t1.Start()
 
+# Delete all annotation elements
+try:
+    doc.Delete(annoIds)
+except:
+    pass
+
 # Commit transaction
 t1.Commit()
-# Commit transaction
-t.Commit()
 # Commit group transaction
 tg.Commit()
