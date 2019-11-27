@@ -87,17 +87,17 @@ if delAnnotations:
             elemIds = [x.Id for x in collector]
             annoElements = annoElements + elemIds
     annoIds = List[DB.ElementId](annoElements)
-    print annoIds
 
 # Create single transaction and start it
 t1 = DB.Transaction(doc, "Delete annotation elements")
 t1.Start()
 
 # Delete all annotation elements
-try:
-    doc.Delete(annoIds)
-except:
-    pass
+for i in annoIds:
+    try:
+        doc.Delete(i)
+    except:
+        pass
 
 # Commit transaction
 t1.Commit()
