@@ -52,8 +52,9 @@ viewsIdKeep = [x.Id for x in viewsCollector if x.LookupParameter(param) != None 
 delAnnotations = forms.alert("Confirm to delete annotation elements", title="Delete annotations?", yes=True, no=True)
 
 # Create group transaction
-tg = DB.Transactiongroup(doc, "Delete elements in document")
-
+tg = DB.TransactionGroup(doc, "Delete elements in document")
+# Start group transaction
+tg.Start()
 # Create single transaction and start it
 t = DB.Transaction(doc, "Delete views")
 t.Start()
@@ -63,6 +64,11 @@ for v in viewsIdDelete:
         doc.Delete(v)
     except:
         pass
+
+if delAnnotations:
+    categories = doc.Settings.Categories
+    for cat in categories:
+        print cat.Name
 
 # Commit transaction
 t.Commit()
