@@ -44,10 +44,18 @@ with forms.ProgressBar(step=10) as pb:
     viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
     sheetsCollector = DB.FilteredElementCollector(doc).OfClass(DB.ViewSheet)
 
-    # Select parameter in view
-    view = [x for x in viewsCollector if x.ViewType == DB.ViewType.FloorPlan][0]
-    param = [p.Definition.Name for p in view.Parameters if "View Set" in p.Definition.Name][0]
-
+    # Select parameter in selected view
+    view = None
+    for v in viewsCollector:
+        if v.ViewType == DB.ViewType.FloorPlan:
+            view = v
+            break
+    param = None
+    for p in view.Parameters:
+        if "View Set" in p.Definition.Name:
+            param = p.Definition.Name
+            break
+    
     # Set view set to select
     viewSet = [x.LookupParameter(param).AsString() for x in viewsCollector if x.LookupParameter(param) != None]
     selectSet = sorted(set(viewSet))
@@ -73,10 +81,10 @@ with forms.ProgressBar(step=10) as pb:
     # Start group transaction
     tg.Start()
 
+    # Collect annotation categories to be deleted
+    annoElements = []
     # Check if annotation elements must be deleted
     if delAnnotations:
-        # Collect annotation categories to be deleted
-        annoElements = []
         categories = doc.Settings.Categories
         for cat in categories:
             if cat.CategoryType == DB.CategoryType.Annotation:
@@ -108,7 +116,7 @@ with forms.ProgressBar(step=10) as pb:
     t1.Start()
 
     # Delete all annotation elements
-    for i in annoIds:
+    for i in annoElements:
         try:
             doc.Delete(i)
         except:
