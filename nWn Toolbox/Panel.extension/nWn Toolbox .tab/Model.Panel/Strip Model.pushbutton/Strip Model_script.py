@@ -62,6 +62,8 @@ with forms.ProgressBar(step=10) as pb:
 
     # Display select view sets form
     vSet = forms.SelectFromList.show(selectSet, "View Set to Keep", 600, 600, multiselect=True)
+    # Exclude start page to be deleted
+    vSet.append("START PAGE")
 
     # Classify views
     viewsIdDelete = [x.Id for x in viewsCollector if x.LookupParameter(param) == None or \
@@ -70,7 +72,7 @@ with forms.ProgressBar(step=10) as pb:
                     x.LookupParameter(param).AsString() in vSet]
 
     # Prompt form to check if user wants to keep annotations
-    delAnnotations = forms.alert("Confirm to delete annotation elements", title="Delete annotations?", yes=True, no=True)
+    delAnnotations = forms.alert("Delete annotation elements", title="Delete annotations?", yes=True, no=True)
 
     # Update progress bar
     pb.update_progress(count, finalCount)
@@ -83,18 +85,24 @@ with forms.ProgressBar(step=10) as pb:
 
     # Collect annotation categories to be deleted
     annoElements = []
+
     # Check if annotation elements must be deleted
     if delAnnotations:
+        
+        # Categories
         categories = doc.Settings.Categories
+        # Elements of categories to delete
+        catDel = ("Dimensions", "Railing Tags", "Furniture Tags", "Spot Slopes", "Spot Elevations", "Floor Tags", "Door Tags", "Window Tags", "Specialty Equipment Tags", "Material Tags", "Property Line Segment Tags", "Wall Tags", "Parking Tags", "Color Fill Legends", "Spot Elevation Symbols", "Structural Column Tags", "Room Tags", "Generic Model Tags", "Title Blocks", "Text Notes", "Callout Heads", "Structural Foundation Tags", "Lighting Device Tags", "Curtain Panel Tags", "Ceiling Tags", "Generic Annotations", "Plumbing Fixture Tags", "Roof Tags", "Casework Tags", "Revision Clouds", "Reference Planes", "Electrical Fixture Tags")
+        # Check elements to delete
         for cat in categories:
             if cat.CategoryType == DB.CategoryType.Annotation:
                 collector = DB.FilteredElementCollector(doc).OfCategoryId(cat.Id)
-                elemIds = [x.Id for x in collector]
+                elemIds = [x.Id for x in collector if x.Category.Name in catDel]
                 annoElements = annoElements + elemIds
-        annoIds = List[DB.ElementId](annoElements)
-
+        # annoIds = List[DB.ElementId](annoElements)
+       
     finalCount = len(annoElements + viewsIdDelete)
-
+    
     # Create single transaction and start it
     t = DB.Transaction(doc, "Delete views")
     t.Start()
@@ -114,7 +122,6 @@ with forms.ProgressBar(step=10) as pb:
     # Create single transaction and start it
     t1 = DB.Transaction(doc, "Delete annotation elements")
     t1.Start()
-
     # Delete all annotation elements
     for i in annoElements:
         try:
