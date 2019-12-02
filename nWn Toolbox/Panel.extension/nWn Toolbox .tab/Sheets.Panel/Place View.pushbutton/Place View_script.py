@@ -15,6 +15,15 @@ from pyrevit import forms
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Function to retrieve titleblock from sheets
+def titleBlock(sheet):
+    titleBlock = ""
+    ele = DB.FilteredElementCollector(doc).OwnedByView(sheet.Id)
+    for e in ele:
+        if hasattr(e.Category, 'Name') and e.Category.Name == "Title Blocks":
+            titleBlock = e
+            return titleBlock
+
 # Form to select sheet
 sheets = forms.select_sheets()
 
@@ -27,6 +36,7 @@ t.Start()
 
 # Place current view on selected sheets
 for s in sheets:
+    titleBlock = titleBlock(s)
     DB.Viewport.Create(revit.doc, s.Id, curView.Id, DB.XYZ(1.94882, 1.37795, 0))
 
 # Commit transaction
