@@ -110,16 +110,18 @@ with forms.ProgressBar(step=10) as pb:
                 elemIds = [x.Id for x in collector if x.Category.Name in catDel]
                 annoElements = annoElements + elemIds
         # annoIds = List[DB.ElementId](annoElements)
-       
-    finalCount = len(annoElements + viewsIdDelete)
+    
+    # Collect all elemtns to delete
+    delElements = annoElements + viewsIdDelete
+    finalCount = len(delElements)
     
     # Create single transaction and start it
-    t = DB.Transaction(doc, "Delete views")
+    t = DB.Transaction(doc, "Delete elements")
     t.Start()
 
-    for v in viewsIdDelete:
+    for e in delElements:
         try:
-            doc.Delete(v)
+            doc.Delete(e)
         except:
             pass
         # Update progress bar
@@ -128,21 +130,5 @@ with forms.ProgressBar(step=10) as pb:
 
     # Commit transaction
     t.Commit()
-
-    # Create single transaction and start it
-    t1 = DB.Transaction(doc, "Delete annotation elements")
-    t1.Start()
-    # Delete all annotation elements
-    for i in annoElements:
-        try:
-            doc.Delete(i)
-        except:
-            pass
-        # Update progress bar
-        pb.update_progress(count, roundNumber(finalCount, 10))
-        count += 1
-
-    # Commit transaction
-    t1.Commit()
     # Commit group transaction
     tg.Commit()
