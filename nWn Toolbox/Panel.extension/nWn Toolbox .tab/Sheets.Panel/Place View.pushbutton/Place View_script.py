@@ -21,3 +21,13 @@ sheets = forms.select_sheets()
 # Retrieve current view
 curView = doc.ActiveView
 
+# Create and start transaction
+t = DB.Transaction(doc, "Place view on sheets")
+t.Start()
+
+# Place current view on selected sheets
+for s in sheets:
+    DB.Viewport.Create(revit.doc, s.Id, curView.Id, DB.XYZ(1.94882, 1.37795, 0))
+
+# Commit transaction
+t.Commit()
