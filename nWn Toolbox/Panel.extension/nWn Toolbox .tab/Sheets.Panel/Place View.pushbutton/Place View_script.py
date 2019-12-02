@@ -26,9 +26,12 @@ def titleBlock(sheet):
 
 # Function to retrieve width and height of titleblock
 def size(titleblock):
+    size = {"height":0, "width":0}
     height = titleBlock.get_Parameter(DB.BuiltInParameter.SHEET_WIDTH).AsDouble()
     width = titleBlock.get_Parameter(DB.BuiltInParameter.SHEET_HEIGHT).AsDouble()
-    return height, width
+    size["height"] = height
+    size["width"] = width
+    return size
 
 # Form to select sheet
 sheets = forms.select_sheets()
@@ -43,8 +46,8 @@ t.Start()
 # Place current view on selected sheets
 for s in sheets:
     titleBlock = titleBlock(s)
-    height = size(titleBlock)[0]
-    width = size(titleBlock)[1]
+    height = size(titleBlock)["height"]
+    width = size(titleBlock)["width"]
     DB.Viewport.Create(revit.doc, s.Id, curView.Id, DB.XYZ(height/2, width/2, 0))
 
 # Commit transaction
