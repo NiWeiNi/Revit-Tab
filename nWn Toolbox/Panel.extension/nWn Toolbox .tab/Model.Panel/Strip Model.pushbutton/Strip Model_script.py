@@ -57,6 +57,10 @@ with forms.ProgressBar(step=10) as pb:
     # Collect all views and sheets
     viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
     sheetsCollector = DB.FilteredElementCollector(doc).OfClass(DB.ViewSheet)
+    # Collect all imported elements
+    linksCollector = DB.FilteredElementCollector(doc).OfClass(DB.ImportInstance)
+    revitLinkCollector = DB.FilteredElementCollector(doc).OfClass(DB.RevitLinkType)
+    imagesCollector = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_RasterImages)
 
     # Select parameter in selected view
     view = None
@@ -85,6 +89,11 @@ with forms.ProgressBar(step=10) as pb:
     viewsIdKeep = [x.Id for x in viewsCollector if x.LookupParameter(param) != None and \
                     x.LookupParameter(param).AsString() in vSet]
 
+    # Retrieve id of all linked elements
+    importedInstancesId = [x.Id for x in linksCollector]
+    revitLinksId = [x.Id for x in revitLinkCollector]
+    imagesId = [x.Id for x in imagesCollector]
+
     # Prompt form to check if user wants to keep annotations
     delAnnotations = forms.alert("Delete annotation elements", title="Delete annotations?", yes=True, no=True)
 
@@ -112,7 +121,7 @@ with forms.ProgressBar(step=10) as pb:
         # annoIds = List[DB.ElementId](annoElements)
     
     # Collect all elemtns to delete
-    delElements = annoElements + viewsIdDelete
+    delElements = annoElements + viewsIdDelete + importedInstancesId + revitLinksId + imagesId
     finalCount = len(delElements)
     
     # Create single transaction and start it
