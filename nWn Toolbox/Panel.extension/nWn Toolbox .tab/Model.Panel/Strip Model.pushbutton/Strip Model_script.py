@@ -34,6 +34,16 @@ def checkCentral():
     else:
         return False
 
+# Function to round to ten
+def roundNumber(number, multiple):
+    remainder = number % multiple
+    if remainder != 0:
+        addNumber = multiple - remainder
+        updatedNumber = addNumber + number 
+        return updatedNumber
+    else:
+        return number
+
 # Create progress bar
 count = 1
 finalCount = 0
@@ -78,10 +88,6 @@ with forms.ProgressBar(step=10) as pb:
     # Prompt form to check if user wants to keep annotations
     delAnnotations = forms.alert("Delete annotation elements", title="Delete annotations?", yes=True, no=True)
 
-    # Update progress bar
-    pb.update_progress(count, finalCount)
-    count += 1
-
     # Create group transaction
     tg = DB.TransactionGroup(doc, "Delete elements in document")
     # Start group transaction
@@ -117,7 +123,7 @@ with forms.ProgressBar(step=10) as pb:
         except:
             pass
         # Update progress bar
-        pb.update_progress(count, finalCount)
+        pb.update_progress(count, roundNumber(finalCount, 10))
         count += 1
 
     # Commit transaction
@@ -133,7 +139,7 @@ with forms.ProgressBar(step=10) as pb:
         except:
             pass
         # Update progress bar
-        pb.update_progress(count, finalCount)
+        pb.update_progress(count, roundNumber(finalCount, 10))
         count += 1
 
     # Commit transaction
