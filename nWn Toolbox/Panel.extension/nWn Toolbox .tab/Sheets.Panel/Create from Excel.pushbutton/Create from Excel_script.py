@@ -36,17 +36,16 @@ def retData(array1, array2):
     return sheets
 
 # Function to create sheets
-def createSheets(numbers, names, titleBlock):
-    for numb, nam in zip(numb, nam):
-        try:
-            sheet = DB.ViewSheet.Create(doc, titleBlock.Id)
-            sheet.SheetNumber = numb
-            sheet.Name = nam
-        except:
-            pass
+def createSheet(number, name, titleBlockId):
+    sheet = DB.ViewSheet.Create(doc, titleBlockId)
+    sheet.SheetNumber = number
+    sheet.Name = name
 
 # Prompt user to specify file path
-pathFile = forms.pick_file(files_filter='Excel Workbook (*.xlsx)|*.xlsx|''Excel 97-2003 Workbook|*.xls')
+pathFile = forms.pick_file(files_filter='Excel Workbook (*.xlsx)|*.xlsx|''Excel 97-2003 Workbook|*.xls')       
+
+# Prompt user to select titleblock
+titleBlock = forms.select_titleblocks(doc=doc)
 
 # Create Excel object
 excel = Excel.ApplicationClass()
@@ -57,15 +56,18 @@ ws = workbook.Worksheets[1]
 # Read data
 sNumber = ws.Range["A1", "A1000"]
 sName = ws.Range["B1", "B1000"]
-
-sheetNumbers = retData(sNumber.Value2, sName.Value2)["sheetNumbers"][1:]
-sheetNames = retData(sNumber.Value2, sName.Value2)["sheetNames"][1:]
+sheetNumbers = [str(x) for x in retData(sNumber.Value2, sName.Value2)["sheetNumbers"][1:]]
+sheetNames = [str(x) for x in retData(sNumber.Value2, sName.Value2)["sheetNames"][1:]]
 
 # Create and start transtaction
 t = DB.Transaction(doc, "Create Sheets")
 t.Start()
 # Create sheets
-
+for sNumb, sNam in zip(sheetNumbers, sheetNames):
+    try:
+        createSheet(sNumb, sNam, titleBlock)
+    except:
+        pass
 
 # Commit transaction
 t.Commit()
