@@ -141,7 +141,7 @@ with forms.ProgressBar(step=10) as pb:
         # Categories
         categories = doc.Settings.Categories
         # Elements of categories to delete
-        catDel = ("Dimensions", "Railing Tags", "Furniture Tags", "Spot Slopes", "Spot Elevations", "Floor Tags", "Door Tags", "Window Tags", "Specialty Equipment Tags", "Material Tags", "Property Line Segment Tags", "Wall Tags", "Parking Tags", "Color Fill Legends", "Spot Elevation Symbols", "Structural Column Tags", "Room Tags", "Generic Model Tags", "Title Blocks", "Text Notes", "Callout Heads", "Structural Foundation Tags", "Lighting Device Tags", "Curtain Panel Tags", "Ceiling Tags", "Generic Annotations", "Plumbing Fixture Tags", "Roof Tags", "Casework Tags", "Revision Clouds", "Reference Planes", "Electrical Fixture Tags")
+        catDel = ("Dimensions", "Railing Tags", "Furniture Tags", "Spot Slopes", "Spot Elevations", "Floor Tags", "Door Tags", "Window Tags", "Specialty Equipment Tags", "Material Tags", "Property Line Segment Tags", "Wall Tags", "Parking Tags", "Color Fill Legends", "Spot Elevation Symbols", "Structural Column Tags", "Room Tags", "Generic Model Tags", "Text Notes", "Callout Heads", "Structural Foundation Tags", "Lighting Device Tags", "Curtain Panel Tags", "Ceiling Tags", "Generic Annotations", "Plumbing Fixture Tags", "Roof Tags", "Casework Tags", "Revision Clouds", "Reference Planes", "Electrical Fixture Tags")
         # Check elements to delete
         for cat in categories:
             if cat.CategoryType == DB.CategoryType.Annotation:
