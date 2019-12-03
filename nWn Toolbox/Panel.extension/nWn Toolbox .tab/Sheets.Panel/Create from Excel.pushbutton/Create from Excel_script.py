@@ -35,6 +35,16 @@ def retData(array1, array2):
     sheets = {"sheetNumbers" : data1, "sheetNames" : data2}
     return sheets
 
+# Function to create sheets
+def createSheets(numbers, names, titleBlock):
+    for numb, nam in zip(numb, nam):
+        try:
+            sheet = DB.ViewSheet.Create(doc, titleBlock.Id)
+            sheet.SheetNumber = numb
+            sheet.Name = nam
+        except:
+            pass
+
 # Prompt user to specify file path
 pathFile = forms.pick_file(files_filter='Excel Workbook (*.xlsx)|*.xlsx|''Excel 97-2003 Workbook|*.xls')
 
@@ -50,6 +60,15 @@ sName = ws.Range["B1", "B1000"]
 
 sheetNumbers = retData(sNumber.Value2, sName.Value2)["sheetNumbers"][1:]
 sheetNames = retData(sNumber.Value2, sName.Value2)["sheetNames"][1:]
+
+# Create and start transtaction
+t = DB.Transaction(doc, "Create Sheets")
+t.Start()
+# Create sheets
+
+
+# Commit transaction
+t.Commit()
 
 """
 excel.ActiveWorkbook.Close(False)
