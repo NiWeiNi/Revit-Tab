@@ -12,6 +12,7 @@ from pyrevit import script
 from pyrevit import forms
 
 import clr
+import System
 clr.AddReference("System")
 from System.Collections.Generic import List
 
@@ -43,6 +44,35 @@ def roundNumber(number, multiple):
         return updatedNumber
     else:
         return number
+
+# Function to purge file
+def purge():
+    purgeGuid = 'e8c63650-70b7-435a-9010-ec97660c1bda'
+    purgableElementIds = []
+    performanceAdviser = DB.PerformanceAdviser.GetPerformanceAdviser()
+    guid = System.Guid(purgeGuid)
+    ruleId = None
+    allRuleIds = performanceAdviser.GetAllRuleIds()
+    for rule in allRuleIds:
+        # Finds the PerformanceAdviserRuleId for the purge command
+        if str(rule.Guid) == purgeGuid:
+            ruleId = rule
+    ruleIds = List[DB.PerformanceAdviserRuleId]([ruleId])
+    for i in range(3):
+        # Purge
+        failureMessages = performanceAdviser.ExecuteRules(doc, ruleIds)
+        if failureMessages.Count > 0:
+            # Retrieves the elements
+            purgableElementIds = failureMessages[0].GetFailingElements()
+    # Delete elements
+    try:
+        doc.Delete(purgableElementIds)
+    except:
+        for e in purgableElementIds:
+            try:
+                doc.Delete(e)
+            except:
+                pass
 
 # Create progress bar
 count = 1
@@ -136,6 +166,9 @@ with forms.ProgressBar(step=10) as pb:
         # Update progress bar
         pb.update_progress(count, roundNumber(finalCount, 10))
         count += 1
+
+    # Purge file
+    # purge()
 
     # Commit transaction
     t.Commit()
