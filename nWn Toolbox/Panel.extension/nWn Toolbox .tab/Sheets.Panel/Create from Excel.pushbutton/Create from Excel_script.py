@@ -15,7 +15,6 @@ from pyrevit import forms
 import clr
 clr.AddReference("Microsoft.Office.Interop.Excel")
 from Microsoft.Office.Interop import Excel
-from System.Runtime.InteropServices import Marshal
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -79,11 +78,5 @@ with forms.ProgressBar(step=10) as pb:
     # Commit transaction
     t.Commit()
 
-"""
-excel.ActiveWorkbook.Close(False)
-Marshal.ReleaseComObject(ws)
-Marshal.ReleaseComObject(workbook)
-Marshal.ReleaseComObject(excel)
-"""
 excel.Workbooks.close()
 excel.quit()
