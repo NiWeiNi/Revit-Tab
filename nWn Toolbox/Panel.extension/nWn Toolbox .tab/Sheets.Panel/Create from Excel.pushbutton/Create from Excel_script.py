@@ -59,18 +59,25 @@ sName = ws.Range["B1", "B1000"]
 sheetNumbers = [str(x) for x in retData(sNumber.Value2, sName.Value2)["sheetNumbers"][1:]]
 sheetNames = [str(x) for x in retData(sNumber.Value2, sName.Value2)["sheetNames"][1:]]
 
-# Create and start transtaction
-t = DB.Transaction(doc, "Create Sheets")
-t.Start()
-# Create sheets
-for sNumb, sNam in zip(sheetNumbers, sheetNames):
-    try:
-        createSheet(sNumb, sNam, titleBlock)
-    except:
-        pass
+# Create progress bar
+count = 1
+finalCount = len(sheetNumbers)
+with forms.ProgressBar(step=10) as pb:
+    # Create and start transtaction
+    t = DB.Transaction(doc, "Create Sheets")
+    t.Start()
+    # Create sheets
+    for sNumb, sNam in zip(sheetNumbers, sheetNames):
+        try:
+            createSheet(sNumb, sNam, titleBlock)
+        except:
+            pass
+        # Update progress bar
+        pb.update_progress(count, finalCount)
+        count += 1
 
-# Commit transaction
-t.Commit()
+    # Commit transaction
+    t.Commit()
 
 """
 excel.ActiveWorkbook.Close(False)
