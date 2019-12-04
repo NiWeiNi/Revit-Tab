@@ -20,6 +20,8 @@ roomsCollector = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.
 # Retrieve levels
 levels = DB.FilteredElementCollector(doc).OfClass(DB.Level)
 levelNames = [x.Name for x in levels]
+# Retrieve lines
+lines = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Lines)
 
 # Clasify rooms by level name
 roomsDict = {}
@@ -29,3 +31,19 @@ for r in roomsCollector:
         roomsDict[lvName] = [r]
     else:
         roomsDict[lvName].append(r)
+
+# Function to retrieve rooms by level name
+def roomsBylevel(levelName):
+    if levelName in roomsDict.keys():
+        rooms = roomsDict[lvN]
+        return rooms
+
+# Retrieve line to renumber elements
+for lvN in levelNames:
+    for l in lines:
+        if l.LookupParameter("Work Plane") != None:
+            wP = l.LookupParameter("Work Plane").AsString()
+            lineName = l.LineStyle.Name
+            if wP == "Level : " + lvN and lineName == "Room Number Line":
+                print l
+            
