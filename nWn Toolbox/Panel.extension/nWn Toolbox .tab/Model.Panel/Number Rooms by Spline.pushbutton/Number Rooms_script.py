@@ -38,12 +38,28 @@ def roomsBylevel(levelName):
         rooms = roomsDict[lvN]
         return rooms
 
+# Options for solid intersection
+optSol = DB.SolidCurveIntersectionOptions()
+
+# Options for spatial elements
+spOpt = DB.SpatialElementBoundaryOptions()
+
 # Retrieve line to renumber elements
+interSeg = []
 for lvN in levelNames:
+    rooms = roomsBylevel(lvN)
     for l in lines:
         if l.LookupParameter("Work Plane") != None:
             wP = l.LookupParameter("Work Plane").AsString()
             lineName = l.LineStyle.Name
             if wP == "Level : " + lvN and lineName == "Room Number Line":
-                print l
-            
+                line = l.GeometryCurve
+    # Obtain intersection between room and curve
+    for r in rooms:
+        # Spatial element to solid
+        calc = DB.SpatialElementGeometryCalculator(doc, spOpt)
+        rCalc = calc.CalculateSpatialElementGeometry(r)
+        rGeo = rCalc.GetGeometry()
+        # Get the intersection of curve and solid
+        inter = rGeo.IntersectWithCurve(line, optSol)
+        interSeg.append(inter)
