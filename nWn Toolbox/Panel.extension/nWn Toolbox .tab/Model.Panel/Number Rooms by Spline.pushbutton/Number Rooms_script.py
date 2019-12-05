@@ -42,6 +42,11 @@ def roomsBylevel(levelName, rooms):
         roomsL = rooms[lvN]
         return roomsL
 
+# Function to modify room number
+def changeRoomNumber(room, number):
+    number = str(number)
+    room.LookupParameter("Number").Set(number)
+
 # Rooms by level name
 roomsDict = roomSorted(roomsF)
 
@@ -86,9 +91,20 @@ for lvN in levelNames:
                 lineName = l.LineStyle.Name
                 if wP == "Level : " + lvN and lineName == "Room Number Line":
                     line = l.GeometryCurve
+                    print line.IsBound
         # Obtain intersection between room and curve
+        numbRooms = len(rooms)
         for r in rooms:
-            for norParam in range(10):
+            for norParam, number in zip(range(0, numbRooms * 4), range(numbRooms)):
                 # Check if point in curve is inside room
-                cPoint = line.Evaluate(norParam/10, True)
-                print cPoint
+                cPoint = line.Evaluate(norParam/1000.0, True)
+                if r.IsPointInRoom(cPoint):
+                    # Create single transaction and start it
+                    t = DB.Transaction(doc, "Renumber Door")
+                    t.Start()
+                    print "Inside!"
+                    r.LookupParameter("Room")
+                    changeRoomNumber(r, number)
+                     # Commit transaction
+                    t.Commit()
+                    break
