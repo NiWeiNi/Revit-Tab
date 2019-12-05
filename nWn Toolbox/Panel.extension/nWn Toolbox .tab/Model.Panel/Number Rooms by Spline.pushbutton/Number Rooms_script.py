@@ -50,7 +50,7 @@ optSol = DB.SolidCurveIntersectionOptions()
 
 # Options for spatial elements
 spOpt = DB.SpatialElementBoundaryOptions()
-
+"""
 # Retrieve line to renumber elements
 interSeg = []
 for lvN in levelNames:
@@ -72,4 +72,23 @@ for lvN in levelNames:
             # Get the intersection of curve and solid
             inter = rGeo.IntersectWithCurve(line, optSol)
             interSeg.append(inter)
-            
+"""         
+
+# Retrieve line to renumber elements
+interSeg = []
+for lvN in levelNames:
+    rooms = roomsBylevel(lvN, roomsDict)
+    # Check there are rooms in the level
+    if rooms != None:
+        for l in lines:
+            if l.LookupParameter("Work Plane") != None:
+                wP = l.LookupParameter("Work Plane").AsString()
+                lineName = l.LineStyle.Name
+                if wP == "Level : " + lvN and lineName == "Room Number Line":
+                    line = l.GeometryCurve
+        # Obtain intersection between room and curve
+        for r in rooms:
+            for norParam in range(10):
+                # Check if point in curve is inside room
+                cPoint = line.Evaluate(norParam/10, True)
+                print cPoint
