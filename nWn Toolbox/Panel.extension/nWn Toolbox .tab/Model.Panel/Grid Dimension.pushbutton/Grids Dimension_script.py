@@ -4,14 +4,10 @@
 __title__ = 'Dimension\nGrids'
 __author__ = "nWn"
 
-# Import commom language runtime
-import clr
-# Import Revit API
-from Autodesk.Revit.DB import FilteredElementCollector, ElementCategoryFilter, \
-							BuiltInCategory, ReferenceArray, Reference, Transaction, \
-							TransactionGroup, Line
-# Import Revit API
-from Autodesk.Revit.Creation.ItemFactoryBase import NewDimension
+# Import 
+from pyrevit import revit, DB
+from pyrevit import script
+from pyrevit import forms
 
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
@@ -21,24 +17,25 @@ uidoc = __revit__.ActiveUIDocument
 view = doc.ActiveView
 
 # Select all grids by filter
-gridsFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids)
-gridsCollector = FilteredElementCollector(doc).WherePasses(gridsFilter) \
-				.WhereElementIsNotElementType()
+gridsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Grids)
+gridsCollector = DB.FilteredElementCollector(doc).WherePasses(gridsFilter).WhereElementIsNotElementType()
 
 # Variables to split grids into columns and rows
-gridsColumn = ReferenceArray()
-gridsRow = ReferenceArray()
+gridsColumn = DB.ReferenceArray()
+gridsRow = DB.ReferenceArray()
 gridsC = []
 gridsR = []
 
 # Check grids name and split in groups
 for grid in gridsCollector:
 	gridName = grid.LookupParameter("Name").AsString()
+	print grid
+	print gridName
 	if any(char.isdigit() for char in gridName):
-		gridsColumn.Append(Reference(grid))
+		gridsColumn.Append(DB.Reference(grid))
 		gridsC.append(grid)
 	else:
-		gridsRow.Append(Reference(grid))
+		gridsRow.Append(DB.Reference(grid))
 		gridsR.append(grid)
 
 # Retrieve endpoints
@@ -49,11 +46,11 @@ endPointR0 = gridsR[0].Curve.GetEndPoint(0)
 endPointR1 = gridsR[-1].Curve.GetEndPoint(0)
 
 # Create line to place dimension
-lineC = Line.CreateBound(endPointC0, endPointC1)
-lineR = Line.CreateBound(endPointR0, endPointR1)
+lineC = DB.Line.CreateBound(endPointC0, endPointC1)
+lineR = DB.Line.CreateBound(endPointR0, endPointR1)
 
 # Create transaction to create dimensions
-t = Transaction(doc, "Dimension grids")
+t = DB.Transaction(doc, "Dimension grids")
 t.Start()
 
 # Create dimensions
