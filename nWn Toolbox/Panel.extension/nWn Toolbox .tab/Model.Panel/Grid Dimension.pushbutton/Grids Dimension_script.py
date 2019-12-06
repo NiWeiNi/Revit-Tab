@@ -9,10 +9,24 @@ from pyrevit import revit, DB
 from pyrevit import script
 from pyrevit import forms
 
+import clr
+import System
+clr.AddReference("System")
+from System.Collections.Generic import List
+
 # Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
+# Function to check if lineas are parallel
+def parallel(gridA, gridB):
+	startA = gridA.Curve.GetEndPoint(0)
+	startB = gridB.Curve.GetEndPoint(0)
+	# Check if vectors are parallel
+	crossP = startA.CrossProduct(startB)
+	if crossP.X == 0 and crossP.Y == 0:
+		return True
+	
 # Get current view
 view = doc.ActiveView
 
@@ -20,6 +34,21 @@ view = doc.ActiveView
 gridsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Grids)
 gridsCollector = DB.FilteredElementCollector(doc).WherePasses(gridsFilter).WhereElementIsNotElementType()
 
+# Convert gridsCollector into list and split them into parall
+grids = list(gridsCollector)
+gridGroups = {}
+excludedGrids = []
+for grid in grids:
+	if grid not in excludedGrids:
+		gridName = grid.LookupParameter("Name").AsString()
+		gridCurve = grid.Curve
+		for g in grids:
+			iRA = DB.IntersectionResultArray()
+			inter = gridCurve.Intersect(g.Curve)
+			if inter == DB.SetComparisonResult.Disjoint:
+				print parallel(grid, g)
+
+"""
 # Variables to split grids into columns and rows
 gridsColumn = DB.ReferenceArray()
 gridsRow = DB.ReferenceArray()
@@ -29,8 +58,6 @@ gridsR = []
 # Check grids name and split in groups
 for grid in gridsCollector:
 	gridName = grid.LookupParameter("Name").AsString()
-	print grid
-	print gridName
 	if any(char.isdigit() for char in gridName):
 		gridsColumn.Append(DB.Reference(grid))
 		gridsC.append(grid)
@@ -59,3 +86,4 @@ doc.Create.NewDimension(view, lineR, gridsRow)
 
 # Commit transaction
 t.Commit()
+"""
