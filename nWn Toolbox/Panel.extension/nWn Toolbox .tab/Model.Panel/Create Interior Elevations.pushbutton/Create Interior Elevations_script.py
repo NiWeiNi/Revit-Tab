@@ -73,9 +73,9 @@ def roomCenter(room):
 	return per
 
 # Function to create sheet
-def createSheet(room, titleBlockId):
+def createSheet(room, titleBlockId, prefix = "INTERIOR ELEVATIONS"):
 	sheet = DB.ViewSheet.Create(doc, titleBlockId)
-	sheet.Number = room.Number
+	sheet.Name = room.Number + " - " + prefix
 
 # Function to create elevations
 def createElev(rooms, viewTypeId):
