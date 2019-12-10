@@ -27,6 +27,12 @@ class ElevForm(forms.TemplateListItem):
 	def name(self):
 		return self.item.LookupParameter("Type Name").AsString()
 
+# Title Block wrapper
+class TitleBlockForm(forms.TemplateListItem):
+	@ property
+	def name(self):
+		return '{} --- {}'.format(self.item.LookupParameter("Family Name").AsString(), self.item.LookupParameter("Type Name").AsString())
+
 # Function to display select room
 def roomElev():
 	# Collect all rooms
@@ -45,6 +51,14 @@ def viewTypeId():
 	# Prompt selection list
 	return forms.SelectFromList.show(elevNames, "Elevation Type", 600, 300).Id
 	
+# Retrieve Title Block Type Id
+def titleTypeId():
+	# Collect all title block types
+	titleBlocksCollector = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType()
+	titleNames = sorted([TitleBlockForm(x) for x in titleBlocksCollector], key=lambda x: x.FamilyName)
+	# Prompt selection list
+	return forms.SelectFromList.show(titleNames, "Title Block Type", 600, 300).Id
+
 # Retrieve boundaries of rooms
 def boundaries(room):
 	# Spatial element boundary options class
@@ -58,6 +72,11 @@ def roomCenter(room):
 	per = room.Perimeter
 	return per
 
+# Function to create sheet
+def createSheet(room, titleBlockId):
+	sheet = DB.ViewSheet.Create(doc, titleBlockId)
+	sheet.Number = room.Number
+
 # Function to create elevations
 def createElev(rooms, viewTypeId):
 	for r in rooms:
@@ -69,6 +88,7 @@ def createElev(rooms, viewTypeId):
 # Prompt to select rooms
 roomsElev = roomElev()
 viewTypeId = viewTypeId()
+titleBlockId = titleTypeId()
 
 # Create transaction and start it
 t = DB.Transaction(doc, "Create Markers")
