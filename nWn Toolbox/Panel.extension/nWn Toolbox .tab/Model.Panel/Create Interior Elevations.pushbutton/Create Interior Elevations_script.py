@@ -57,3 +57,23 @@ def boundaries(room):
 def roomCenter(room):
 	per = room.Perimeter
 	return per
+
+# Function to create elevations
+def createElev(rooms, viewTypeId):
+	for r in rooms:
+		if r.Location != None:
+			marker = DB.ElevationMarker.CreateElevationMarker(doc, viewTypeId, r.Location.Point, 5)
+			for intView in range(0,4):
+				marker.CreateElevation(doc, doc.ActiveView.Id, intView)
+
+# Prompt to select rooms
+roomsElev = roomElev()
+viewTypeId = viewTypeId()
+
+# Create transaction and start it
+t = DB.Transaction(doc, "Create Markers")
+t.Start()
+# Create elevation markers
+createElev(roomsElev, viewTypeId)
+# Commit transaction
+t.Commit()
