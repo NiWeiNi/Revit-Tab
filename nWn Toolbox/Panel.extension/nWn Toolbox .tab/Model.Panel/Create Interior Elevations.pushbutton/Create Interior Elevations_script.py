@@ -21,6 +21,12 @@ class RoomsForm(forms.TemplateListItem):
 	def name(self):
 		return '{} --- {}'.format(self.item.Number, self.item.LookupParameter("Name").AsString())
 
+# View Type wrapper
+class ElevForm(forms.TemplateListItem):
+	@ property
+	def name(self):
+		return self.item.LookupParameter("Type Name").AsString()
+
 # Function to display select room
 def roomElev():
 	# Collect all rooms
@@ -30,9 +36,24 @@ def roomElev():
 	# Prompt selection list
 	return forms.SelectFromList.show(roomNumber, "Rooms to Elevate", 600, 600, multiselect = True)
 
+# Retrieve ViewFamilyType Id
+def viewTypeId():
+	# Collect all viewType
+	elevCollector = DB.FilteredElementCollector(doc).OfClass(DB.ViewFamilyType)
+	elevs = [x for x in elevCollector if x.LookupParameter("Family Name").AsString() == "Elevation"]
+	elevNames = sorted([ElevForm(x) for x in elevs], key=lambda x: x.FamilyName)
+	# Prompt selection list
+	return forms.SelectFromList.show(elevNames, "Elevation Type", 600, 300).Id
+	
+# Retrieve boundaries of rooms
+def boundaries(room):
+	# Spatial element boundary options class
+	sEBO = DB.SpatialElementBoundaryOptions()
+	# Retrieve boundaries
+	bounda = room.GetBoundarySegments(sEBO)
+	return bounda
+
+# Function to retrieve center of room
 def roomCenter(room):
 	per = room.Perimeter
 	return per
-
-# Prompt to select rooms
-roomsElev = roomElev()
