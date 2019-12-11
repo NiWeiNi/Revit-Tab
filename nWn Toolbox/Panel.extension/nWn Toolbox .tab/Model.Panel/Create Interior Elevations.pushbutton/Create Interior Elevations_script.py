@@ -33,6 +33,10 @@ class TitleBlockForm(forms.TemplateListItem):
 	def name(self):
 		return '{} --- {}'.format(self.item.LookupParameter("Family Name").AsString(), self.item.LookupParameter("Type Name").AsString())
 
+# Function alert and quit
+def alert(message):
+	return forms.alert(message, ok = True, exitscript= True)
+
 # Function to display select room
 def roomElev():
 	# Collect all rooms
@@ -47,17 +51,30 @@ def viewTypeId():
 	# Collect all viewType
 	elevCollector = DB.FilteredElementCollector(doc).OfClass(DB.ViewFamilyType)
 	elevs = [x for x in elevCollector if x.LookupParameter("Family Name").AsString() == "Elevation"]
-	elevNames = sorted([ElevForm(x) for x in elevs], key=lambda x: x.FamilyName)
-	# Prompt selection list
-	return forms.SelectFromList.show(elevNames, "Elevation Type", 600, 300).Id
+	# Check if user's input is required
+	if len(elevs) > 1:
+		elevNames = sorted([ElevForm(x) for x in elevs], key=lambda x: x.FamilyName)
+		# Prompt selection list
+		return forms.SelectFromList.show(elevNames, "Elevation Type", 600, 300).Id
+	elif len(elevs) == 1:
+		return elevs[0].Id
+	else:
+		alert("No Elevation Marker has been defined in the project. Please create an Elevation Marker.")
 	
 # Retrieve Title Block Type Id
 def titleTypeId():
 	# Collect all title block types
 	titleBlocksCollector = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType()
-	titleNames = sorted([TitleBlockForm(x) for x in titleBlocksCollector], key=lambda x: x.FamilyName)
-	# Prompt selection list
-	return forms.SelectFromList.show(titleNames, "Title Block Type", 600, 300).Id
+	# Check if user's input is required
+	titleBlocks = list(titleBlocksCollector)
+	if len(titleBlocks) > 1:
+		# Prompt selection list
+		titleNames = sorted([TitleBlockForm(x) for x in titleBlocksCollector], key=lambda x: x.FamilyName)
+		return forms.SelectFromList.show(titleNames, "Title Block Type", 600, 300).Id
+	elif len(titleBlocks) == 1:
+		return titleBlocks[0].Id
+	else:
+		alert("No Title Block loaded. Please load a Title Block.")
 
 # Retrieve boundaries of rooms
 def boundaries(room):
