@@ -117,14 +117,22 @@ def roomCenter(room):
 def createSheet(room, titleBlockId, prefix = "INTERIOR ELEVATIONS"):
 	sheet = DB.ViewSheet.Create(doc, titleBlockId)
 	sheet.Name = room.Number + " - " + prefix
+	return sheet
 
 # Function to create elevations
 def createElev(room, viewTypeId, location):
+	viewsId = []
 	if room.Location != None:
 		marker = DB.ElevationMarker.CreateElevationMarker(doc, viewTypeId, location, 5)
 		# Create all views for elevations, integers from 0 to 3
 		for intView in range(0,4):
-			marker.CreateElevation(doc, doc.ActiveView.Id, intView)
+			view = marker.CreateElevation(doc, doc.ActiveView.Id, intView)
+			viewsId.append(view.Id)
+	return viewsId
+
+# Function to place views on sheets
+def placeViews(viewSheetId, ViewId, point):
+	DB.Viewport.Create(doc, viewSheetId, ViewId, point)
 
 # Prompt to select rooms
 roomsElev = roomElev()
@@ -139,6 +147,10 @@ for r in roomsElev:
 	bounda = boundaries(r)
 	points = boundaPoints(bounda)
 	center = centroid(points)
-	createElev(r, viewTypeId, center)
+	viewsId = createElev(r, viewTypeId, center)
+	sheet = createSheet(r, titleBlockId)
+	# Place views on sheets
+	for v in viewsId:
+		placeViews(sheet.Id, v, DB.XYZ(0,0,0))
 # Commit transaction
 t.Commit()
