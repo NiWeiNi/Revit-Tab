@@ -27,6 +27,12 @@ class ElevForm(forms.TemplateListItem):
 	def name(self):
 		return self.item.LookupParameter("Type Name").AsString()
 
+# View Template wrapper
+class ViewTempForm(forms.TemplateListItem):
+	@ property
+	def name(self):
+		return self.item.Name
+
 # Title Block wrapper
 class TitleBlockForm(forms.TemplateListItem):
 	@ property
@@ -76,6 +82,16 @@ def titleTypeId():
 	else:
 		alert("No Title Block loaded. Please load a Title Block.")
 
+# Retrieve view templates
+def viewTempId():
+	# Collect all views
+	viewsCollector = DB.FilteredElementCollector(doc).OfClass(DB.View)
+	# Filter view templates
+	viewTemplates = [v for v in viewsCollector if v.IsTemplate]
+	# Prompt selection list
+	viewTemps = sorted([ViewTempForm(x) for x in viewTemplates], key=lambda x: x.Name)
+	return forms.SelectFromList.show(viewTemps, "View Template", 600, 300).Id
+
 # Retrieve boundaries of rooms
 def boundaries(room):
 	# Spatial element boundary options class
@@ -120,13 +136,14 @@ def createSheet(room, titleBlockId, prefix = "INTERIOR ELEVATIONS"):
 	return sheet
 
 # Function to create elevations
-def createElev(room, viewTypeId, location):
+def createElev(room, viewTypeId, location, viewTempId):
 	viewsId = []
 	if room.Location != None:
 		marker = DB.ElevationMarker.CreateElevationMarker(doc, viewTypeId, location, 5)
 		# Create all views for elevations, integers from 0 to 3
 		for intView in range(0,4):
 			view = marker.CreateElevation(doc, doc.ActiveView.Id, intView)
+			view.ViewTemplateId = viewTempId
 			viewsId.append(view.Id)
 	return viewsId
 
@@ -138,6 +155,7 @@ def placeViews(viewSheetId, ViewId, point):
 roomsElev = roomElev()
 viewTypeId = viewTypeId()
 titleBlockId = titleTypeId()
+viewTempId = viewTempId()
 
 # Create transaction and start it
 t = DB.Transaction(doc, "Create Markers")
@@ -147,7 +165,7 @@ for r in roomsElev:
 	bounda = boundaries(r)
 	points = boundaPoints(bounda)
 	center = centroid(points)
-	viewsId = createElev(r, viewTypeId, center)
+	viewsId = createElev(r, viewTypeId, center, viewTempId)
 	sheet = createSheet(r, titleBlockId)
 	# Place views on sheets
 	for v in viewsId:
