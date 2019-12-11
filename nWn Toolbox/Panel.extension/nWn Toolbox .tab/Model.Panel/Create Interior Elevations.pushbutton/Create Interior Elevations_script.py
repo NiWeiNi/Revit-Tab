@@ -84,6 +84,30 @@ def boundaries(room):
 	bounda = room.GetBoundarySegments(sEBO)
 	return bounda
 
+# Function to extract points from boundary
+def boundaPoints(segs):
+	points = []
+	if len(segs) == 1:
+		# Extract underlaying curve
+		for s in segs[0]:
+			curve = s.GetCurve()
+			point = curve.GetEndPoint(0)
+			points.append(point)
+		return points
+
+# Function to retrieve centroid
+def centroid(points):
+	# Retrieve single coordinates
+	xCoor = [x[0] for x in points]
+	yCoor = [y[1] for y in points]
+	zCoor = [z[2] for z in points]
+	length = len(points)
+	# Retrieve center
+	xCenter = sum(xCoor) / length
+	yCenter = sum(yCoor) / length
+	zCenter = sum(zCoor) / length
+	return DB.XYZ(xCenter, yCenter, zCenter)
+
 # Function to retrieve center of room
 def roomCenter(room):
 	per = room.Perimeter
@@ -95,12 +119,12 @@ def createSheet(room, titleBlockId, prefix = "INTERIOR ELEVATIONS"):
 	sheet.Name = room.Number + " - " + prefix
 
 # Function to create elevations
-def createElev(rooms, viewTypeId):
-	for r in rooms:
-		if r.Location != None:
-			marker = DB.ElevationMarker.CreateElevationMarker(doc, viewTypeId, r.Location.Point, 5)
-			for intView in range(0,4):
-				marker.CreateElevation(doc, doc.ActiveView.Id, intView)
+def createElev(room, viewTypeId, location):
+	if room.Location != None:
+		marker = DB.ElevationMarker.CreateElevationMarker(doc, viewTypeId, location, 5)
+		# Create all views for elevations, integers from 0 to 3
+		for intView in range(0,4):
+			marker.CreateElevation(doc, doc.ActiveView.Id, intView)
 
 # Prompt to select rooms
 roomsElev = roomElev()
@@ -111,6 +135,10 @@ titleBlockId = titleTypeId()
 t = DB.Transaction(doc, "Create Markers")
 t.Start()
 # Create elevation markers
-createElev(roomsElev, viewTypeId)
+for r in roomsElev:
+	bounda = boundaries(r)
+	points = boundaPoints(bounda)
+	center = centroid(points)
+	createElev(r, viewTypeId, center)
 # Commit transaction
 t.Commit()
