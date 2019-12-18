@@ -67,10 +67,42 @@ def overCat(categories, docCat):
 	# Commit transaction
 	t.Commit()
 
+# Function to select option for script
+def selectOver(opt1, opt2):
+	formSel = forms.SelectFromList.show([opt1, opt2], multiselect=False, height=300,
+			title="Override View Option", button_name="Select View Option")
+	return formSel
+
+# Function to revert view overrrides back to default
+def revertBack():
+	# Retrieve current view
+	activeView = doc.ActiveView
+	# Override tranparency settings
+	overtransparency = DB.OverrideGraphicSettings()
+	# Create a individual transaction
+	t = DB.Transaction(doc, "Override category visibility")
+	# Start individual transaction
+	t.Start()
+	# Override all categories transparency
+	for c in cat():
+		try:
+			activeView.SetCategoryOverrides(c.Id, overtransparency)
+		except:
+			pass
+	# Commit transaction
+	t.Commit()
+
 # Function to override categories
 def overrideCat():
 	sel = pickEl()
 	cats = retCat(sel)
 	overCat(cats, cat())
 
-overrideCat()
+# Call the functions to start script
+opt1 = "Reset View to Default"
+opt2 = "Make Categories Transparent"
+sel = selectOver(opt1, opt2)
+if sel == opt1:
+	revertBack()
+else:
+	overrideCat()
