@@ -15,3 +15,24 @@ uidoc = __revit__.ActiveUIDocument
 # Import Python modules
 import os
 import re
+
+# Record for user action and store selected path
+directory = forms.pick_folder()
+
+# Retrieve all pathfiles and names from directory and subdirectories
+def retrieveFamilies(directory):
+	familiesNames = list()
+	for folderName, subFolders, files in os.walk(directory):
+		# Check if there are Revit families
+		families = re.compile(r"[^{ddd+}]\.rfa$")
+		for file in files:
+			# Assign matched files to a variable
+			matched = families.search(file)
+			if matched:
+				# Get path of families
+				filePath = os.path.join(folderName, file)
+				familiesNames.append(filePath)
+	return familiesNames
+
+# Call function to search for families in path and subfolders
+familiesList = retrieveFamilies(directory)
