@@ -32,7 +32,7 @@ doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Dialog in Revit document to instruct user
-TaskDialog.Show("Isolated Selection", "Pick curve for matrix path and press Finish")
+TaskDialog.Show("Isolated Selection", "Pick curve for matrix path")
 
 # Define class to filter elements of category to select 
 class CustomSelectionFilter(ISelectionFilter):
@@ -49,10 +49,10 @@ class CustomSelectionFilter(ISelectionFilter):
 # Select curve
 objType = ObjectType.Element
 customFilter = CustomSelectionFilter(DB.BuiltInCategory.OST_Lines)
-selCurve = uidoc.Selection.PickObjects(objType, customFilter, "Pick curve for matrix path and press Finish")
+selCurve = uidoc.Selection.PickObject(objType, customFilter, "Pick curve for matrix path")
 
 # Convert the reference element into a geometry curve
-curve = doc.GetElement(selCurve[0].ElementId).GeometryCurve
+curve = doc.GetElement(selCurve.ElementId).GeometryCurve
 
 # Tessellate curve to get points
 tesseCurve = curve.Tessellate()
