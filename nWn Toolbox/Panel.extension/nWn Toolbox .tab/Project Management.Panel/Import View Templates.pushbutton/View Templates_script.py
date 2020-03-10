@@ -12,15 +12,12 @@ import clr
 # Import C# List
 from System.Collections.Generic import List
 
-# Import Revit DB
-from Autodesk.Revit.DB import FilteredElementCollector, ElementTransformUtils, BuiltInCategory, \
-                            ElementId, Transform, CopyPasteOptions, Transaction, TransactionGroup, ElementCategoryFilter
-
-# Import pyRevit forms
+# Import 
+from pyrevit import revit, DB
+from pyrevit import script
 from pyrevit import forms
 
-# Store current document to variable
-app = __revit__.Application
+# Store current document into variable
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
@@ -28,24 +25,24 @@ uidoc = __revit__.ActiveUIDocument
 selProject = forms.select_open_docs(title="Select project/s to transfer View Templates", button_name='OK', width=500, multiple=True, filterfunc=None)
 
 # Filter Views
-viewsFilter = ElementCategoryFilter(BuiltInCategory.OST_Views)
+viewsFilter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_Views)
 
 # Function to retrieve View Templates
 def retrieveVT(docList, currentDoc):
 	storeDict = {}
 	if isinstance(docList, list):
 		for pro in docList:
-			viewsCollector = FilteredElementCollector(pro).WherePasses(viewsFilter)
+			viewsCollector = DB.FilteredElementCollector(pro).WherePasses(viewsFilter)
 			for view in viewsCollector:
 				if view.IsTemplate == True:
 					storeDict[view.Name + " - " + pro.Title] = view
 	elif currentDoc == True:
-		viewsCollector = FilteredElementCollector(docList).WherePasses(viewsFilter)
+		viewsCollector = DB.FilteredElementCollector(docList).WherePasses(viewsFilter)
 		for view in viewsCollector:
 			if view.IsTemplate == True:
 				storeDict[view.Name] = view
 	else:
-		viewsCollector = FilteredElementCollector(docList).WherePasses(viewsFilter)
+		viewsCollector = DB.FilteredElementCollector(docList).WherePasses(viewsFilter)
 		for view in viewsCollector:
 			if view.IsTemplate == True:
 				storeDict[view.Name + " - " + docList.Title] = view
@@ -78,7 +75,7 @@ for vNoProj, vT in zip(vTemplatesNoProj, vTemplates):
 vTemplates = newVTemplates
 
 # Collect all views from the current document
-docViewsCollector = FilteredElementCollector(doc).WherePasses(viewsFilter)
+docViewsCollector = DB.FilteredElementCollector(doc).WherePasses(viewsFilter)
 
 # Check for duplicate View Templates in the current project
 dupViewTemplates = []
@@ -91,16 +88,16 @@ for vN, vT in docTemplates.items():
 def checkViewT(viewsList):
 	viewsWVT = {}
 	for v in viewsList:
-		if v.ViewTemplateId != ElementId.InvalidElementId:
+		if v.ViewTemplateId != DB.ElementId.InvalidElementId:
 			viewsWVT.setdefault(v.ViewTemplateId.ToString(), []).append(v)
 	return viewsWVT
 
 # Transform object
-transIdent = Transform.Identity
-copyPasteOpt = CopyPasteOptions()
+transIdent = DB.Transform.Identity
+copyPasteOpt = DB.CopyPasteOptions()
 
 # Create single transaction and start it
-t = Transaction(doc, "Copy View Templates")
+t = DB.Transaction(doc, "Copy View Templates")
 t.Start()
 
 # Check for all views that has a view template
@@ -109,14 +106,14 @@ viewsWVT = checkViewT(docViewsCollector)
 viewsFail = []
 viewsSuccess = []
 for vT in vTemplates:
-	vTId = List[ElementId]()
+	vTId = List[DB.ElementId]()
 	for pro in selProject:
 		if pro.Title in vT:
 			vTId.Add(viewTemplates[vT].Id)
 			# Check if view template is used in current doc
 			if vT.replace(" - " + pro.Title, "") not in docTemplates.keys():
 				# If not, copy the selected View Template to current project
-				ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+				DB.ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 			# View templates are already in use in the current project
 			else:
 				vToApplyVT = []
@@ -132,7 +129,7 @@ for vT in vTemplates:
 							elName = doc.GetElement(v.ViewTemplateId).Name
 							if elName in vT:
 								doc.Delete(v.ViewTemplateId)
-								et = ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
+								et = DB.ElementTransformUtils.CopyElements(pro, vTId, doc, transIdent, copyPasteOpt)
 							else:
 								break
 						# Assign view template
@@ -157,5 +154,5 @@ def printMessage(resultList, failedList, message, messageWarning):
 		print("\n".join(resultList))
 
 # Print message
-printMessage(viewsSuccess, viewsFail, "The following view's view template have been changed:",
+printMessage(viewsSuccess, viewsFail, "The following view templates have been changed:",
 			"View templates failed to apply to views, make sure the proper view template type is named:")
