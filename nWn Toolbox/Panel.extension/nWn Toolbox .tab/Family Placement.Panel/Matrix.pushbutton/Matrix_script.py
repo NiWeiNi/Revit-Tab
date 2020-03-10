@@ -32,7 +32,7 @@ doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Dialog in Revit document to instruct user
-TaskDialog.Show("Isolated Selection", "Pick curve for matrix path")
+TaskDialog.Show("Isolated Selection", "Pick curve for matrix path and press Finish")
 
 # Define class to filter elements of category to select 
 class CustomSelectionFilter(ISelectionFilter):
@@ -49,7 +49,7 @@ class CustomSelectionFilter(ISelectionFilter):
 # Select curve
 objType = ObjectType.Element
 customFilter = CustomSelectionFilter(DB.BuiltInCategory.OST_Lines)
-selCurve = uidoc.Selection.PickObjects(objType, customFilter, "Pick curve for matrix path")
+selCurve = uidoc.Selection.PickObjects(objType, customFilter, "Pick curve for matrix path and press Finish")
 
 # Convert the reference element into a geometry curve
 curve = doc.GetElement(selCurve[0].ElementId).GeometryCurve
@@ -77,21 +77,22 @@ for p in tesseCurve:
 		endPoint = p
 
 # Retrieve family to place on points
-markingSymbol = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_GenericModel)
-markingSymbol.OfClass(FamilySymbol).ToElements()
+markingSymbol = DB.FilteredElementCollector(doc).OfClass(DB.FamilySymbol)
+symbolNames = [x.Family.Name for x in markingSymbol]
 
-cogSymbol = markingSymbol.FirstElement()
+familyName = forms.SelectFromList.show(symbolNames, button_name='Select Item')
+
 for element in markingSymbol:
-	if element.FamilyName == "CoG":
-		cogSymbol = element
+	if element.FamilyName == familyName:
+		famSymbol = element
 
 # Create a individual transaction
-t = Transaction(doc, "Divide curve")
+t = DB.Transaction(doc, "Divide curve")
 # Start individual transaction
 t.Start()
 
 for p in finalPoints:
-	doc.Create.NewFamilyInstance(p, cogSymbol, Structure.StructuralType.NonStructural)
+	doc.Create.NewFamilyInstance(p, famSymbol, DB.Structure.StructuralType.NonStructural)
 
 # Commit transaction
 t.Commit()
