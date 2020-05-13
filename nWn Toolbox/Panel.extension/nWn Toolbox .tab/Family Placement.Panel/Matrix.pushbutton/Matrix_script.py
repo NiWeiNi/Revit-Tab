@@ -16,9 +16,10 @@ import math
 from Autodesk.Revit.UI.Selection import ObjectType, ISelectionFilter
 from Autodesk.Revit.UI import TaskDialog
 
-# Import Revit DB
-from Autodesk.Revit.DB import DividedPath, Transaction, TransactionGroup,\
-							FilteredElementCollector, FamilySymbol, Structure, ImportInstance, BuiltInCategory
+# Import 
+from pyrevit import revit, DB
+from pyrevit import script
+from pyrevit import forms
 
 # Import modules to create windows dialogues in Revit for user input
 clr.AddReference('System.Windows.Forms')
@@ -31,14 +32,14 @@ doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
 # Dialog in Revit document to instruct user
-TaskDialog.Show("Isolated Selection", "Pick curve for path of matrix")
+TaskDialog.Show("Isolated Selection", "Pick curve for matrix path")
 
 # Define class to filter elements of category to select 
-class CustomISelectionFilter(ISelectionFilter):
-	def __init__(self, categorie):
-		self.categorie = categorie
+class CustomSelectionFilter(ISelectionFilter):
+	def __init__(self, category):
+		self.category = category
 	def AllowElement(self, e):
-		if e.Category.Name == self.categorie:
+		if e.Category.Id == DB.Category.GetCategory(doc, self.category).Id:
 			return True
 		else:
 			return False
@@ -47,10 +48,11 @@ class CustomISelectionFilter(ISelectionFilter):
 
 # Select curve
 objType = ObjectType.Element
-selCurve = uidoc.Selection.PickObjects(objType, "Pick elements to isolate with transparency")
+customFilter = CustomSelectionFilter(DB.BuiltInCategory.OST_Lines)
+selCurve = uidoc.Selection.PickObject(objType, customFilter, "Pick curve for matrix path")
 
 # Convert the reference element into a geometry curve
-curve = doc.GetElement(selCurve[0].ElementId).GeometryCurve
+curve = doc.GetElement(selCurve.ElementId).GeometryCurve
 
 # Tessellate curve to get points
 tesseCurve = curve.Tessellate()
@@ -75,21 +77,22 @@ for p in tesseCurve:
 		endPoint = p
 
 # Retrieve family to place on points
-markingSymbol = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
-markingSymbol.OfClass(FamilySymbol).ToElements()
+markingSymbol = DB.FilteredElementCollector(doc).OfClass(DB.FamilySymbol)
+symbolNames = [x.Family.Name for x in markingSymbol]
 
-cogSymbol = markingSymbol.FirstElement()
+familyName = forms.SelectFromList.show(symbolNames, button_name='Select Item')
+
 for element in markingSymbol:
-	if element.FamilyName == "CoG":
-		cogSymbol = element
+	if element.FamilyName == familyName:
+		famSymbol = element
 
 # Create a individual transaction
-t = Transaction(doc, "Divide curve")
+t = DB.Transaction(doc, "Divide curve")
 # Start individual transaction
 t.Start()
 
 for p in finalPoints:
-	doc.Create.NewFamilyInstance(p, cogSymbol, Structure.StructuralType.NonStructural)
+	doc.Create.NewFamilyInstance(p, famSymbol, DB.Structure.StructuralType.NonStructural)
 
 # Commit transaction
 t.Commit()
